@@ -152,7 +152,8 @@ class MsiStockProvider implements StockProviderInterface
             $configuration->setStoreId($storeId);
             $result[$productId] = [
                 'qty' => $this->getQty($stockData, $reservation),
-                'in_stock' => $this->getIsInStock($stockData, $reservation, $configuration)
+                'in_stock' => $this->getIsInStock($stockData, $reservation, $configuration),
+                'manage_stock' => $configuration->getManageStock()
             ];
         }
 

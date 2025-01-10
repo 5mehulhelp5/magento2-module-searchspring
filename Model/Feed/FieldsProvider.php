@@ -43,6 +43,7 @@ class FieldsProvider
         'cached_thumbnail',
         'stock_qty',
         'in_stock',
+        'manage_stock',
         'categories',
         'category_hierarchy',
         'saleable',
