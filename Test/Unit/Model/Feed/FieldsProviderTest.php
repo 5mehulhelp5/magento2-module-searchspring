@@ -43,6 +43,7 @@ class FieldsProviderTest extends \PHPUnit\Framework\TestCase
         'cached_thumbnail',
         'stock_qty',
         'in_stock',
+        'is_stock_managed',
         'categories',
         'category_hierarchy',
         'saleable',

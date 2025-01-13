@@ -197,7 +197,7 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
         $itemMock->expects($this->once())
             ->method('setStoreId')
             ->with(1);
-        $itemMock->expects($this->once())
+        $itemMock->expects($this->any())
             ->method('getManageStock')
             ->willReturn(false);
         $getReservationsQuantityMock->expects($this->at(1))
@@ -207,7 +207,7 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
         $itemMockSecond->expects($this->once())
             ->method('setStoreId')
             ->with(1);
-        $itemMockSecond->expects($this->once())
+        $itemMockSecond->expects($this->any())
             ->method('getManageStock')
             ->willReturn(true);
         $itemMockSecond->expects($this->once())
@@ -224,7 +224,7 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
         $itemMockThird->expects($this->once())
             ->method('setStoreId')
             ->with(1);
-        $itemMockThird->expects($this->once())
+        $itemMockThird->expects($this->any())
             ->method('getManageStock')
             ->willReturn(true);
         $itemMockThird->expects($this->once())
@@ -240,14 +240,17 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
                 1 => [
                     'qty' => 1 + $reservationFirst,
                     'in_stock' => true,
+                    'is_stock_managed' => false
                 ],
                 2 => [
                     'qty' => 2 + $reservationSecond,
                     'in_stock' => true,
+                    'is_stock_managed' =>true
                 ],
                 3 => [
                     'qty' => 3 + $reservationThird,
-                    'in_stock' => false
+                    'in_stock' => false,
+                    'is_stock_managed' =>true
                 ]
             ],
             $this->msiStockProvider->getStock($productIds, 1)

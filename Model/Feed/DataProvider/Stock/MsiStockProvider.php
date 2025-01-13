@@ -109,7 +109,8 @@ class MsiStockProvider implements StockProviderInterface
      * [
      *      product_id => [
      *          'qty' => float,
-     *          'in_stock' => bool
+     *          'in_stock' => bool,
+     *          'is_stock_managed' =>bool
      *      ],
      *      .........
      * ]
