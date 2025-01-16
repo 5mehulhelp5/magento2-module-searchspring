@@ -82,6 +82,10 @@ class StockProvider implements DataProviderInterface
                 if (!in_array('stock_qty', $ignoreFields) && isset($stockItem['qty'])) {
                     $product['stock_qty'] = (float) $stockItem['qty'];
                 }
+
+                if (!in_array('is_stock_managed', $ignoreFields)) {
+                    $product['is_stock_managed'] = (int) $stockItem['is_stock_managed'];
+                }
             }
         }
 

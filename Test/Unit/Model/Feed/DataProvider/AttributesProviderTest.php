@@ -92,11 +92,13 @@ class AttributesProviderTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'product_model' => $productMock,
-                    'code' => 'code'
+                    'code' => 'code',
+                    'test1' => 'data2'
                 ],
                 [
                     'product_model' => $productMock,
-                    'code' => 'code1'
+                    'code' => 'code1',
+                    'test1' => 'data2'
                 ]
             ],
             $this->attributesProvider->getData($products, $feedSpecificationMock)
