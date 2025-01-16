@@ -68,4 +68,10 @@
             <resource ref="SearchSpring_Feed::task" />
         </resources>
     </route>
+    <route url="/V1/searchspring/product/:id" method="GET">
+        <service class="SearchSpring\Feed\Api\ProductRepositoryInterface" method="getItem" />
+        <resources>
+            <resource ref="SearchSpring_Feed::task" />
+        </resources>
+    </route>
 </routes>

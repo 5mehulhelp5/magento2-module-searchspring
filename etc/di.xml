@@ -71,6 +71,12 @@
                 type="SearchSpring\Feed\Model\Aws\Client\Client"/>
     <preference for="SearchSpring\Feed\Model\Aws\Client\ResponseInterface"
                 type="SearchSpring\Feed\Model\Aws\Client\Response"/>
+    <preference for="SearchSpring\Feed\Api\ProductRepositoryInterface"
+                type="SearchSpring\Feed\Model\ProductRepository"/>
+    <preference for="SearchSpring\Feed\Api\RequestItemInterface"
+                type="SearchSpring\Feed\Model\RequestItem"/>
+    <preference for="SearchSpring\Feed\Api\ResponseItemInterface"
+                type="SearchSpring\Feed\Model\ResponseItem"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
