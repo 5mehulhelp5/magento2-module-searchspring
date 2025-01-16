@@ -7,7 +7,8 @@ interface CategoryInfoInterface
     /**
      * Get details of all categories in the store.
      *
+     * @param bool $activeOnly
      * @return array
      */
-    public function getAllCategories(): array;
+    public function getAllCategories(bool $activeOnly = true): array;
 }

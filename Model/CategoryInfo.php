@@ -14,29 +14,34 @@ class CategoryInfo implements CategoryInfoApi
     protected $categoryRepository;
     protected $categoryFactory;
     protected $categoryCollectionFactory;
-    protected $jsonFactory;
 
     public function __construct(
         CategoryRepositoryInterface $categoryRepository,
         CategoryFactory             $categoryFactory,
         CategoryCollectionFactory   $categoryCollectionFactory,
-    ) {
+    )
+    {
         $this->categoryRepository = $categoryRepository;
         $this->categoryFactory = $categoryFactory;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
     }
 
     /**
+     * @param bool $activeOnly
+     * @return array
      * @throws NoSuchEntityException
      */
-    public function getAllCategories(): array
+    public function getAllCategories(bool $activeOnly = true): array
     {
         $categories = [];
 
         // Get the category collection
         $categoryCollection = $this->categoryCollectionFactory->create();
         $categoryCollection->addAttributeToSelect('*'); // Load all attributes
-        $categoryCollection->addIsActiveFilter(); // Only get active categories
+
+        if ($activeOnly) {
+            $categoryCollection->addIsActiveFilter(); // Only get active categories
+        }
 
         // Loop through the categories and collect the relevant data
         foreach ($categoryCollection as $category) {

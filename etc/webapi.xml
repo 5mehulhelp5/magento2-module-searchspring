@@ -69,7 +69,7 @@
         </resources>
     </route>
     <route url="/V1/searchspring/categorylist" method="GET">
-        <service class="SearchSpring\Feed\Api\CategoryInfoInterface" method="getAllCategories" />
+        <service class="SearchSpring\Feed\Api\CategoryInfoInterface" method="getAllCategories"/>
         <resources>
             <resource ref="SearchSpring_Feed::task" />
         </resources>
