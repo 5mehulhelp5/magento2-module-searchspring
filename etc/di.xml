@@ -71,6 +71,8 @@
                 type="SearchSpring\Feed\Model\Aws\Client\Client"/>
     <preference for="SearchSpring\Feed\Model\Aws\Client\ResponseInterface"
                 type="SearchSpring\Feed\Model\Aws\Client\Response"/>
+    <preference for="SearchSpring\Feed\Api\CategoryInfoInterface"
+                type="SearchSpring\Feed\Model\CategoryInfo"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
