@@ -189,9 +189,14 @@ class CategoriesProvider implements DataProviderInterface
             return;
         }
 
+        $storeCode = $feedSpecification->getStoreCode();
+
         foreach ($categories as $category) {
-            $category->setStoreId($feedSpecification->getStoreCode());
-            $this->loadedCategories[$category->getEntityId()] = $category;
+            if ($category) {
+                $category->setStoreId($storeCode);
+
+                $this->loadedCategories[$category->getEntityId()] = $category;
+            }
         }
 
         foreach ($categories as $category) {
