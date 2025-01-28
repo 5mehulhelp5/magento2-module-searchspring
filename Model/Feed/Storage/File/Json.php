@@ -80,7 +80,7 @@ class Json extends FileAbstract
         // Loop through each item and write each item on a new line
         foreach ($data as $item) {
             // Serialize each object individually and add a newline after it
-            $serializedItem = $this->jsonSerializer->serialize($item) . "\n";
+            $serializedItem = $this->jsonSerializer->serialize($item) . PHP_EOL;
             $file->write($serializedItem);
             $serializedItem = [];
         }

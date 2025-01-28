@@ -118,7 +118,7 @@ class GenerateFeed implements GenerateFeedInterface
      */
     public function execute(FeedSpecificationInterface $feedSpecification): void
     {
-        $this->setPresidedUrlFileFormat($feedSpecification);
+        $this->setPresignUrlFileFormat($feedSpecification);
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
             throw new Exception((string) __('%1 is not supported format', $format));
@@ -370,7 +370,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param FeedSpecificationInterface $feedSpecification
      * @return void
      */
-    Private function setPresidedUrlFileFormat(FeedSpecificationInterface $feedSpecification): void
+    Private function setPresignUrlFileFormat(FeedSpecificationInterface $feedSpecification): void
     {
         $urlPath = parse_url($feedSpecification->getPreSignedUrl(), PHP_URL_PATH);
         $fileBaseExtension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
