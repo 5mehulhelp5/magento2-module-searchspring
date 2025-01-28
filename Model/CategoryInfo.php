@@ -28,10 +28,11 @@ class CategoryInfo implements CategoryInfoApi
 
     /**
      * @param bool $activeOnly
+     * @param string $delimiter
      * @return array
      * @throws NoSuchEntityException
      */
-    public function getAllCategories(bool $activeOnly = true): array
+    public function getAllCategories(bool $activeOnly = true, string $delimiter = '>'): array
     {
         $categories = [];
 
@@ -52,7 +53,7 @@ class CategoryInfo implements CategoryInfoApi
                 'ImageLink' => $category->getImageUrl(),
                 'ParentId' => $category->getParentId(),
                 'DisplayName' => $category->getName(),
-                'FullHierarchy' => $this->getFullCategoryHierarchy($category),
+                'FullHierarchy' => $this->getFullCategoryHierarchy($category, $delimiter),
                 'NumProducts' => $category->getProductCount(),
             ];
         }
@@ -64,10 +65,11 @@ class CategoryInfo implements CategoryInfoApi
      * Get full hierarchy of a category
      *
      * @param Category $category
+     * @param string $delimiter
      * @return string
      * @throws NoSuchEntityException
      */
-    private function getFullCategoryHierarchy(Category $category): string
+    private function getFullCategoryHierarchy(Category $category, string $delimiter): string
     {
         $pathIds = $category->getPathIds();
         $categoryHierarchy = [];
@@ -77,6 +79,6 @@ class CategoryInfo implements CategoryInfoApi
             $categoryHierarchy[] = $categoryEntity->getName();
         }
 
-        return implode(' > ', $categoryHierarchy);
+        return implode($delimiter, $categoryHierarchy);
     }
 }

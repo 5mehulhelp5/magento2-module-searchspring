@@ -24,6 +24,7 @@ use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\RuntimeException;
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Model\Aws\PreSignedUrl;
 use SearchSpring\Feed\Model\Feed\Storage\File\FileFactory;
 use SearchSpring\Feed\Model\Feed\Storage\File\NameGenerator;
@@ -156,10 +157,21 @@ class PreSignedUrlStorage implements StorageInterface
     public function commit(bool $deleteFile = true): void
     {
         $file = $this->getFile();
+        $filePath = $file->getAbsolutePath();
+
+        $urlPath = parse_url($this->specification->getPreSignedUrl(), PHP_URL_PATH);
+
+        // For json.gz,csv.gz treat as JSON/ csv format for compression
+        if (str_contains($urlPath, MetadataInterface::FORMAT_JSON_GZ) || str_contains($urlPath, MetadataInterface::FORMAT_CSV_GZ)) {
+            $gzFilePath = $filePath . '.gz';
+            $this->compressFile($filePath, $gzFilePath);
+            $filePath = $gzFilePath;  // Use the gzipped file for saving
+        }
+
         $file->commit();
         $data = [
             'type' => 'stream',
-            'file' => $file->getAbsolutePath()
+            'file' => $filePath,
         ];
 
         try {
@@ -171,6 +183,32 @@ class PreSignedUrlStorage implements StorageInterface
                 $file->delete();
             }
         }
+    }
+
+    /**
+     * Compress the file into GZ format
+     *
+     * @param string $sourceFile
+     * @param string $targetFile
+     * @return void
+     * @throws RuntimeException
+     */
+    private function compressFile(string $sourceFile, string $targetFile): void
+    {
+        $source = fopen($sourceFile, 'rb');
+        $destination = gzopen($targetFile, 'wb9'); // Open file for gz compression
+
+        if ($source === false || $destination === false) {
+            throw new RuntimeException('Unable to open file for compression.');
+        }
+
+        // Compress the file in chunks to avoid memory overflow
+        while (!feof($source)) {
+            gzwrite($destination, fread($source, 1024 * 512)); // 512 KB chunk size
+        }
+
+        fclose($source);
+        gzclose($destination);
     }
 
     /**

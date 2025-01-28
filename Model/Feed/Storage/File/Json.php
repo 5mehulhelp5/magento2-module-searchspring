@@ -76,8 +76,14 @@ class Json extends FileAbstract
         $this->checkFile();
         $this->openFile();
         $file = $this->getFile();
-        $data = $this->jsonSerializer->serialize($data) . "\n";
-        $file->write($data);
-        $data = [];
+
+        // Loop through each item and write each item on a new line
+        foreach ($data as $item) {
+            // Serialize each object individually and add a newline after it
+            $serializedItem = $this->jsonSerializer->serialize($item) . PHP_EOL;
+            $file->write($serializedItem);
+            $serializedItem = [];
+        }
+
     }
 }
