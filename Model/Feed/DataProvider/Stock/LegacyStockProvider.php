@@ -79,12 +79,15 @@ class LegacyStockProvider implements StockProviderInterface
         $items = $this->legacyStockItemRepository->getList($searchCriteria)->getItems();
         $result = [];
         foreach ($items as $item) {
-            /** @var Item $item */
-            $item->setStoreId($storeId);
-            $result[$item->getProductId()] = [
-                'qty' => $item->getQty(),
-                'in_stock' => $item->getIsInStock()
-            ];
+            if ($item) {
+                /** @var Item $item */
+                $item->setStoreId($storeId);
+
+                $result[$item->getProductId()] = [
+                    'qty' => $item->getQty(),
+                    'in_stock' => $item->getIsInStock()
+                ];
+            }
         }
 
         return $result;
