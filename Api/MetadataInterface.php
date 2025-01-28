@@ -29,4 +29,8 @@ interface MetadataInterface
 
     const FORMAT_CSV = 'csv';
     const FORMAT_JSON = 'json';
+    const FORMAT_GZ = 'gz';
+    const FORMAT_JSON_GZ = 'json.gz';
+    const FORMAT_CSV_GZ = 'csv.gz';
+    const FORMAT_UNKNOWN = 'presigned url file extension supported is csv,json,json.gz,csv.gz';
 }
