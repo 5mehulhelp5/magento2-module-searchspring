@@ -171,9 +171,9 @@ interface TaskInterface extends ExtensibleDataInterface
     public function getProductCount(): ?int;
 
     /**
-     * @return array
+     * @return int
      */
-    public function getFileSize(): array;
+    public function getFileSize(): int;
 
     /**
      * @param int $value
@@ -182,8 +182,8 @@ interface TaskInterface extends ExtensibleDataInterface
     public function setProductCount(int $value): self;
 
     /**
-     * @param array $value
+     * @param int $value
      * @return TaskInterface
      */
-    public function setFileSize(array $value): self;
+    public function setFileSize(int $value): self;
 }

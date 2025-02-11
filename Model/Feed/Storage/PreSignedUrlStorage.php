@@ -202,16 +202,8 @@ class PreSignedUrlStorage implements StorageInterface
         // Get the file size (in bytes)
         $fileSize = filesize($filePath);
 
-        // format the file size (e.g., in KB, MB, etc.)
-        // For now, let's just keep it in bytes to MB
-        $fileSizeFormatted = (string)$fileSize;  // or format as needed
-        $fileSizeInMB = $this->bytesToMB($fileSizeFormatted);
-
         $task = $this->taskRepository->get($id);
-        $task->setFileSize([
-            'size' => $fileSizeInMB,
-            "unit"=> "MB",
-        ]);
+        $task->setFileSize($fileSize);
         $this->taskRepository->save($task);
 
         $data = [
@@ -229,18 +221,6 @@ class PreSignedUrlStorage implements StorageInterface
             }
         }
     }
-
-    /**
-     * @param $fileSizeInBytes
-     * @return float
-     */
-    function bytesToMB($fileSizeInBytes): float
-    {
-        // Convert bytes to MB by dividing by 1024 * 1024 (1048576)
-        return round($fileSizeInBytes / 1048576, 2); // Rounding to 2 decimal places for readability
-    }
-
-
 
     /**
      * Compress the file into GZ format

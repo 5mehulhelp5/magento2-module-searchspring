@@ -306,38 +306,28 @@ class Task extends AbstractExtensibleModel implements TaskInterface
     /**
      * Get the file size.
      *
-     * @return array
+     * @return int
      */
-    public function getFileSize(): array
+    public function getFileSize(): int
     {
 
         $fileSize = $this->getData(self::File_Size);
 
         if ($fileSize === null || $fileSize === '') {
-            return []; // Return empty string if no file size is set
+            return 0; // Return empty string if no file size is set
         }
-
-        // Decode JSON string into an object
-        $decodedData = json_decode($fileSize, true); // The 'true' parameter makes it an associative array
-        // If the decoding was successful, return the decoded array
-        if ($decodedData !== null) {
-            return $decodedData; // Return the decoded array directly
-        }
-
-        // If decoding failed, return an empty string or a default value
-        return [];
+        return (int) $fileSize;
     }
 
     /**
      * Set the file size.
      *
-     * @param array $value
+     * @param int $value
      * @return TaskInterface
      */
-    public function setFileSize(array $value): TaskInterface
+    public function setFileSize(int $value): TaskInterface
     {
         // Serialize the array into a JSON string
-        $value = json_encode($value);
         return $this->setData(self::File_Size, $value); // Set the data
     }
 }
