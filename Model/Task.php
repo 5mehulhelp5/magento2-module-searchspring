@@ -327,7 +327,6 @@ class Task extends AbstractExtensibleModel implements TaskInterface
      */
     public function setFileSize(int $value): TaskInterface
     {
-        // Serialize the array into a JSON string
         return $this->setData(self::File_Size, $value); // Set the data
     }
 }
