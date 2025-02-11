@@ -11,6 +11,8 @@
                 comment="Task Created At"/>
         <column xsi:type="timestamp" name="started_at" on_update="false" nullable="true" comment="Task Execution Started At"/>
         <column xsi:type="timestamp" name="ended_at" on_update="false" nullable="true" comment="Task Execution Ended At"/>
+        <column xsi:type="int" name="product_count" nullable="true"  comment="Total Product Count"/>
+        <column xsi:type="varchar" name="file_size" nullable="true" length="100" comment="File Size"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
