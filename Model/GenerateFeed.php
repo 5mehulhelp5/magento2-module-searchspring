@@ -116,7 +116,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param FeedSpecificationInterface $feedSpecification
      * @throws Exception
      */
-    public function execute(FeedSpecificationInterface $feedSpecification): void
+    public function execute(FeedSpecificationInterface $feedSpecification, $id): void
     {
         $this->setPresignUrlFileFormat($feedSpecification);
         $format = $feedSpecification->getFormat();
@@ -150,7 +150,7 @@ class GenerateFeed implements GenerateFeedInterface
                     $metricPage++;
                 }
 
-                $this->storage->addData($itemsData);
+                $this->storage->addData($itemsData, $id);
                 $itemsData = [];
                 $currentPageNumber++;
                 $this->resetDataProvidersAfterFetchItems($feedSpecification);
@@ -163,7 +163,7 @@ class GenerateFeed implements GenerateFeedInterface
             }
         }
 
-        $this->reset($feedSpecification);
+        $this->reset($feedSpecification, $id);
         return;
     }
 
@@ -185,14 +185,15 @@ class GenerateFeed implements GenerateFeedInterface
 
     /**
      * @param FeedSpecificationInterface $feedSpecification
+     * @param $id
      * @throws Exception
      */
-    private function reset(FeedSpecificationInterface $feedSpecification) : void
+    private function reset(FeedSpecificationInterface $feedSpecification, $id): void
     {
         $this->resetDataProviders($feedSpecification);
         $this->collectMetrics('Before Send File');
         try {
-            $this->storage->commit();
+            $this->storage->commit($id);
         } finally {
             $this->collectMetrics('After Send File');
             $this->metricCollector->print(

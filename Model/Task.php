@@ -285,4 +285,48 @@ class Task extends AbstractExtensibleModel implements TaskInterface
         $error = current($errors);
         $this->setError($error);
     }
+
+    /**
+     * @return int|null
+     */
+    public function getProductCount(): ?int
+    {
+        return (int)$this->getData(self::Product_Count);
+    }
+
+    /**
+     * @param int $value
+     * @return TaskInterface
+     */
+    public function setProductCount(int $value): TaskInterface
+    {
+        return $this->setData(self::Product_Count, $value);
+    }
+
+    /**
+     * Get the file size.
+     *
+     * @return int
+     */
+    public function getFileSize(): int
+    {
+
+        $fileSize = $this->getData(self::File_Size);
+
+        if ($fileSize === null || $fileSize === '') {
+            return 0; // Return empty string if no file size is set
+        }
+        return (int) $fileSize;
+    }
+
+    /**
+     * Set the file size.
+     *
+     * @param int $value
+     * @return TaskInterface
+     */
+    public function setFileSize(int $value): TaskInterface
+    {
+        return $this->setData(self::File_Size, $value); // Set the data
+    }
 }

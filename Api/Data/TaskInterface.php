@@ -54,6 +54,15 @@ interface TaskInterface extends ExtensibleDataInterface
      *
      */
     const ENDED_AT = 'ended_at';
+    /**
+     *
+     */
+    const Product_Count = 'product_count';
+    /**
+     *
+     */
+    const File_Size = 'file_size';
+
 
     /**
      * @return mixed
@@ -155,4 +164,26 @@ interface TaskInterface extends ExtensibleDataInterface
     public function setExtensionAttributes(
         \SearchSpring\Feed\Api\Data\TaskExtensionInterface $extensionAttributes
     ): self;
+
+    /**
+     * @return int|null
+     */
+    public function getProductCount(): ?int;
+
+    /**
+     * @return int
+     */
+    public function getFileSize(): int;
+
+    /**
+     * @param int $value
+     * @return TaskInterface
+     */
+    public function setProductCount(int $value): self;
+
+    /**
+     * @param int $value
+     * @return TaskInterface
+     */
+    public function setFileSize(int $value): self;
 }

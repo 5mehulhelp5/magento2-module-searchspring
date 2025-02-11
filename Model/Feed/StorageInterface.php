@@ -30,13 +30,15 @@ interface StorageInterface
 
     /**
      * @param array $data
+     * @param int $id
      */
-    public function addData(array $data) : void;
+    public function addData(array $data, int $id) : void;
 
     /**
      * @param bool $deleteFile
+     * @param int $id
      */
-    public function commit(bool $deleteFile = true) : void;
+    public function commit(int $id, bool $deleteFile = true): void;
 
     /**
      *
