@@ -11,19 +11,28 @@
 namespace SearchSpring\Feed\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\ObjectManager;
-
+use Magento\Framework\App\Filesystem\DirectoryList;
 class LogInfo extends AbstractHelper
 {
-    public function __construct()
+
+    /**
+     * @var DirectoryList
+     */
+    protected $directoryList;
+
+    /**
+     * Constructor.
+     *
+     * @param DirectoryList $directoryList
+     */
+    public function __construct( DirectoryList $directoryList)
     {
+        $this->directoryList = $directoryList;
     }
 
     public function deleteExtensionLogFile() : bool
     {
-        $objectManager = ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList');
-        $logPath = $directory->getPath('log');
+        $logPath = $this->directoryList->getPath(DirectoryList::LOG);
         $logFile = $logPath . '/searchspring_feed.log';
 
         if (file_exists($logFile)) {
@@ -37,9 +46,7 @@ class LogInfo extends AbstractHelper
     {
         $result = '';
 
-        $objectManager = ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList');
-        $logPath = $directory->getPath('log');
+        $logPath = $this->directoryList->getPath(DirectoryList::LOG);
         $logFile = $logPath . '/searchspring_feed.log';
 
         if (file_exists($logFile)) {
@@ -55,9 +62,7 @@ class LogInfo extends AbstractHelper
 
     public function deleteExceptionLogFile() : bool
     {
-        $objectManager = ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList');
-        $logPath = $directory->getPath('log');
+        $logPath = $this->directoryList->getPath(DirectoryList::LOG);
         $logFile = $logPath . '/exception.log';
 
         if (file_exists($logFile)) {
@@ -71,9 +76,7 @@ class LogInfo extends AbstractHelper
     {
         $result = '';
 
-        $objectManager = ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList');
-        $logPath = $directory->getPath('log');
+        $logPath = $this->directoryList->getPath(DirectoryList::LOG);
         $logFile = $logPath . '/exception.log';
 
         if (file_exists($logFile)) {

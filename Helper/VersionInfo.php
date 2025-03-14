@@ -13,6 +13,8 @@ namespace SearchSpring\Feed\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Module\ModuleListInterface;
 
 class VersionInfo extends AbstractHelper
 {
@@ -21,23 +23,40 @@ class VersionInfo extends AbstractHelper
     /** @var ProductMetadataInterface */
     private $productMetadata;
 
-    public function __construct(ProductMetadataInterface $productMetadata)
+    /**
+     * @var DirectoryList
+     */
+    protected $directoryList;
+
+    /**
+     * @var ModuleListInterface
+     */
+    protected $moduleListInterface;
+
+
+    /**
+     * Constructor.
+     *
+     * @param ProductMetadataInterface $productMetadata
+     * @param DirectoryList $directoryList
+     * @param ModuleListInterface $moduleListInterface
+     */
+    public function __construct(ProductMetadataInterface $productMetadata, DirectoryList $directoryList, ModuleListInterface $moduleListInterface)
     {
         $this->productMetadata = $productMetadata;
+        $this->directoryList = $directoryList;
+        $this->moduleListInterface = $moduleListInterface;
     }
 
     public function getVersion()
     {
         $result = [];
-        $objectManager = ObjectManager::getInstance();
 
         $version = null;
-        $module = $objectManager->get('\Magento\Framework\Module\ModuleListInterface')->getOne(self::MODULE_NAME);
+        $module = $this->moduleListInterface->getOne(self::MODULE_NAME);
         if (!empty($module)) {
             $version = $module['setup_version'];
         }
-
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList');
 
         $result[] = [
             'extensionVersion' => $version,
@@ -49,8 +68,8 @@ class VersionInfo extends AbstractHelper
             'magentoName' => $this->productMetadata->getName(),
             'magentoVersion' => $this->productMetadata->getVersion(),
             'magentoEdition' => $this->productMetadata->getEdition(),
-            'magentoRootPath' => $directory->getRoot(),
-            'magentoLogPath' => $directory->getPath('log')
+            'magentoRootPath' => $this->directoryList->getRoot(),
+            'magentoLogPath' => $this->directoryList->getPath(DirectoryList::LOG)
         ];
 
         return $result;

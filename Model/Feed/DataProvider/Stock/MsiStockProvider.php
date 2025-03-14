@@ -33,6 +33,7 @@ use Magento\InventorySalesApi\Api\StockResolverInterface as MsiStockResolverInte
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Filesystem\DirectoryList;
 
 class MsiStockProvider implements StockProviderInterface
 {
@@ -77,6 +78,7 @@ class MsiStockProvider implements StockProviderInterface
      */
     private $typeManager;
 
+
     /**
      * MsiStockProvider constructor.
      * @param StoreManagerInterface $storeManager
@@ -86,6 +88,9 @@ class MsiStockProvider implements StockProviderInterface
      * @param StockItemRepositoryInterface $legacyStockItemRepository
      * @param StockConfigurationInterface $stockConfiguration
      * @param Type $typeManager
+     * @param GetReservationsQuantityInterface $getReservationsQuantity
+     * @param MsiStockResolverInterface $stockResolver
+     * @param GetStockItemDataInterface $getStockItemData
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -94,7 +99,10 @@ class MsiStockProvider implements StockProviderInterface
         StockItemCriteriaInterfaceFactory $legacyStockItemCriteriaFactory,
         StockItemRepositoryInterface $legacyStockItemRepository,
         StockConfigurationInterface $stockConfiguration,
-        Type $typeManager
+        Type $typeManager,
+        GetReservationsQuantityInterface $getReservationsQuantity,
+        MsiStockResolverInterface $stockResolver,
+        GetStockItemDataInterface  $getStockItemData,
     ) {
         $this->storeManager = $storeManager;
         $this->websiteRepository = $websiteRepository;
@@ -103,6 +111,9 @@ class MsiStockProvider implements StockProviderInterface
         $this->legacyStockItemRepository = $legacyStockItemRepository;
         $this->stockConfiguration = $stockConfiguration;
         $this->typeManager = $typeManager;
+        $this->getReservationsQuantity =  $getReservationsQuantity;
+        $this->stockResolver =  $stockResolver;
+        $this->getStockItemData =  $getStockItemData;
     }
 
     /**
@@ -126,7 +137,7 @@ class MsiStockProvider implements StockProviderInterface
             return [];
         }
 
-        $this->init();
+       // $this->init();
         $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
         $website = $this->websiteRepository->getById($websiteId);
         $stock = $this->stockResolver->execute(SalesChannelInterface::TYPE_WEBSITE, $website->getCode());
@@ -166,6 +177,7 @@ class MsiStockProvider implements StockProviderInterface
      */
     private function init() : void
     {
+
         // we cannot use constructor because MSI module codebase can be removed via composer
         if (is_null($this->getReservationsQuantity)) {
             $this->getReservationsQuantity = ObjectManager::getInstance()

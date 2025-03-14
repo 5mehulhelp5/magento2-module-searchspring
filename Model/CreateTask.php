@@ -20,6 +20,8 @@ namespace SearchSpring\Feed\Model;
 
 use Exception;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Module\Manager;
 use SearchSpring\Feed\Api\CreateTaskInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
@@ -55,25 +57,43 @@ class CreateTask implements CreateTaskInterface
     private $uniqueCheckerPool;
 
     /**
+     * @var Manager
+     */
+    private $moduleManager;
+
+    private $moduleList = [
+        'Magento_InventoryReservationsApi',
+        'Magento_InventorySalesApi',
+        'Magento_InventoryCatalogApi',
+        'Magento_Inventory'
+    ];
+
+    /**
      * CreateTask constructor.
      * @param TaskRepositoryInterface $taskRepository
      * @param TaskInterfaceFactory $taskFactory
      * @param ValidatorPool $validatorPool
      * @param TypeList $typeList
      * @param UniqueCheckerPool $uniqueCheckerPool
+    * @param Manager $moduleManager
+     * @param array $moduleList
      */
     public function __construct(
         TaskRepositoryInterface $taskRepository,
         TaskInterfaceFactory $taskFactory,
         ValidatorPool $validatorPool,
         TypeList $typeList,
-        UniqueCheckerPool $uniqueCheckerPool
+        UniqueCheckerPool $uniqueCheckerPool,
+        Manager $moduleManager,
+        array $moduleList = []
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskFactory = $taskFactory;
         $this->validatorPool = $validatorPool;
         $this->typeList = $typeList;
         $this->uniqueCheckerPool = $uniqueCheckerPool;
+        $this->moduleManager = $moduleManager;
+        $this->moduleList = array_merge($this->moduleList, $moduleList);
     }
 
     /**
@@ -83,9 +103,14 @@ class CreateTask implements CreateTaskInterface
      * @throws CouldNotSaveException
      * @throws ValidationException
      * @throws Exception
+     * @throws NoSuchEntityException
      */
     public function execute(string $type, $payload): TaskInterface
     {
+        if (!$this->isMsiEnabled()) {
+            throw new ValidationException(__('MSI is not installed'));
+        }
+
         if (!is_array($payload)) {
             throw new Exception((string) __('$payload must be array'));
         }
@@ -119,5 +144,25 @@ class CreateTask implements CreateTaskInterface
             ->setStatus(MetadataInterface::TASK_STATUS_PENDING);
 
         return $this->taskRepository->save($task);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isMsiEnabled() : bool
+    {
+        $moduleExists = true;
+        foreach ($this->moduleList as $moduleName) {
+            if (!$this->moduleManager->isEnabled($moduleName)) {
+                $moduleExists = false;
+                break;
+            }
+        }
+
+        if (!$moduleExists) {
+            return false;
+        }
+
+        return true;
     }
 }
