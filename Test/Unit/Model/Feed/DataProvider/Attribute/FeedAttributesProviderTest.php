@@ -27,6 +27,10 @@ use SearchSpring\Feed\Model\Feed\Specification\Feed;
 
 class FeedAttributesProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $productAttributeRepositoryMock;
+    private $searchCriteriaBuilderMock;
+    private $feedAttributesProvider;
+
     public function setUp(): void
     {
         $this->productAttributeRepositoryMock = $this->createMock(ProductAttributeRepositoryInterface::class);

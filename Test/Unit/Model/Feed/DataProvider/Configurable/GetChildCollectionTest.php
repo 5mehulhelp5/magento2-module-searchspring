@@ -20,6 +20,7 @@ use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Product\Collection;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Product\CollectionFactory
     as ProductCollectionFactory;
+use Psr\Log\LoggerInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection;
 
 class GetChildCollectionTest extends \PHPUnit\Framework\TestCase
@@ -29,14 +30,20 @@ class GetChildCollectionTest extends \PHPUnit\Framework\TestCase
     private $productCollectionFactoryMock;
 
     private $getChildCollection;
+    /**
+     * @var LoggerInterface
+     */
+    private $loggerMock;
 
     public function setUp(): void
     {
         $this->statusMock = $this->createMock(Status::class);
         $this->productCollectionFactoryMock = $this->createMock(ProductCollectionFactory::class);
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->getChildCollection = new GetChildCollection(
             $this->productCollectionFactoryMock,
-            $this->statusMock
+            $this->statusMock,
+            $this->loggerMock
         );
     }
 

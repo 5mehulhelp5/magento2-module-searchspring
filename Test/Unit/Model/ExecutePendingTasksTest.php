@@ -136,7 +136,9 @@ class ExecutePendingTasksTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new \Exception('message'));
         $this->loggerMock->expects($this->once())
             ->method('error')
-            ->willReturn(true);
+            ->willReturnCallback(function () {
+                // Do nothing (void method)
+            });
 
         $this->executePendingTasks->execute();
     }

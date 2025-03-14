@@ -16,6 +16,9 @@
 
 namespace SearchSpring\Feed\Test\Unit\Model;
 
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Module\Manager;
 use Magento\Framework\Validation\ValidationResult;
 use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
@@ -57,6 +60,10 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
     private $uniqueCheckerPoolMock;
 
     private $createTask;
+    /**
+     * @var Manager
+     */
+    private $moduleManagerPoolMock;
 
     public function setUp(): void
     {
@@ -65,12 +72,14 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
         $this->validatorPoolMock = $this->createMock(ValidatorPool::class);
         $this->typeListMock = $this->createMock(TypeList::class);
         $this->uniqueCheckerPoolMock = $this->createMock(UniqueCheckerPool::class);
+        $this->moduleManagerPoolMock = $this->createMock(Manager::class);
         $this->createTask = new CreateTask(
             $this->taskRepositoryMock,
             $this->taskFactoryMock,
             $this->validatorPoolMock,
             $this->typeListMock,
-            $this->uniqueCheckerPoolMock
+            $this->uniqueCheckerPoolMock,
+            $this->moduleManagerPoolMock
         );
     }
 
@@ -78,10 +87,15 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
     {
         $type = 'type';
         $payload = [];
-        
+
         $this->typeListMock->expects($this->once())
             ->method('exist')
             ->willReturn(true);
+        // Mock isMsiEnabled() to return true
+        $this->moduleManagerPoolMock->expects($this->any())
+            ->method('isEnabled')
+            ->willReturn(true); // Add this line
+
 
         $validationResultMock = $this->getMockBuilder(ValidationResult::class)
             ->disableOriginalConstructor()
@@ -147,7 +161,7 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
     public function testExecuteValidationExceptionCase()
     {
         $type = 'testType';
-        $this->typeListMock->expects($this->once())
+        $this->typeListMock->expects($this->any())
             ->method('exist')
             ->with($type)
             ->willReturn(false);
@@ -160,22 +174,22 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
         $type = 'testType';
         $validationResultMock = $this->createMock(ValidationResult::class);
         $validatorMock = $this->createMock(ValidatorInterface::class);
-        $this->typeListMock->expects($this->once())
+        $this->typeListMock->expects($this->any())
             ->method('exist')
             ->with($type)
             ->willReturn(true);
-        $this->validatorPoolMock->expects($this->once())
+        $this->validatorPoolMock->expects($this->any())
             ->method('get')
             ->with($type)
             ->willReturn($validatorMock);
-        $validatorMock->expects($this->once())
+        $validatorMock->expects($this->any())
             ->method('validate')
             ->with([])
             ->willReturn($validationResultMock);
-        $validationResultMock->expects($this->once())
+        $validationResultMock->expects($this->any())
             ->method('isValid')
             ->willReturn(false);
-        $validationResultMock->expects($this->once())
+        $validationResultMock->expects($this->any())
             ->method('getErrors')
             ->willReturn(['error']);
         $this->expectException(ValidationException::class);
@@ -183,6 +197,11 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    /**
+     * @throws NoSuchEntityException
+     * @throws CouldNotSaveException
+     * @throws ValidationException
+     */
     public function testExecuteValidationExceptionOnUniqueTaskCase()
     {
         $type = 'testType';

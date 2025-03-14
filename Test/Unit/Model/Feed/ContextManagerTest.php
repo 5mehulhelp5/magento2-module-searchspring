@@ -23,6 +23,10 @@ use SearchSpring\Feed\Model\Feed\Specification\Feed;
 
 class ContextManagerTest extends \PHPUnit\Framework\TestCase
 {
+    private $customerContextManagerMock;
+    private $storeContextManagerMock;
+    private $contextManager;
+
     public function setUp(): void
     {
         $this->customerContextManagerMock = $this->createMock(CustomerContextManager::class);

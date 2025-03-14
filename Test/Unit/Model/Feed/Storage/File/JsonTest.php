@@ -29,7 +29,7 @@ class JsonTest extends \PHPUnit\Framework\TestCase
 
     private $randomMock;
 
-    private $jsonSeriazlierMock;
+    private $jsonSerializerMock;
 
     private $csv;
 

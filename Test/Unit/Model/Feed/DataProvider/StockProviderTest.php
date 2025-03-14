@@ -58,6 +58,7 @@ class StockProviderTest extends \PHPUnit\Framework\TestCase
             1 => [
                 'in_stock' => 1,
                 'qty' => 333,
+                'is_stock_managed' => 1,
             ]
         ];
         $this->stockResolverMock->expects($this->once())
@@ -83,7 +84,8 @@ class StockProviderTest extends \PHPUnit\Framework\TestCase
                 $products[0],
                 [
                     'in_stock' => 1,
-                    'stock_qty' => 333.0
+                    'stock_qty' => 333.0,
+                    'is_stock_managed' => 1,
                 ]
             )],
             $this->stockProvider->getData($products, $feedSpecificationMock)

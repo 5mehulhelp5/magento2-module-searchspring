@@ -28,6 +28,7 @@ use Magento\InventoryApi\Api\Data\StockInterface;
 use Magento\InventoryReservationsApi\Model\GetReservationsQuantityInterface;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
 use Magento\InventorySalesApi\Api\StockResolverInterface;
+use Magento\InventorySalesApi\Api\StockResolverInterface as MsiStockResolverInterface;
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
@@ -51,6 +52,20 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
 
     private $typeManagerMock;
 
+    /**
+     * @var GetReservationsQuantityInterface
+     */
+    private $getReservationsQuantityMock;
+
+    /**
+     * @var MsiStockResolverInterface
+     */
+    private $stockResolverMock;
+
+    /**
+     * @var GetStockItemDataInterface
+     */
+    private $getStockItemDataMock;
     private $msiStockProvider;
 
     public function setUp(): void
@@ -62,6 +77,9 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
         $this->legacyStockItemRepositoryMock = $this->createMock(StockItemRepositoryInterface::class);
         $this->stockConfigurationMock = $this->createMock(StockConfigurationInterface::class);
         $this->typeManagerMock = $this->createMock(Type::class);
+        $this->getReservationsQuantityMock = $this->createMock(GetReservationsQuantityInterface::class);
+        $this->stockResolverMock = $this->createMock(MsiStockResolverInterface::class);
+        $this->getStockItemDataMock = $this->createMock(GetStockItemDataInterface::class);
         $this->msiStockProvider = new MsiStockProvider(
             $this->storeManagerMock,
             $this->websiteRepositoryMock,
@@ -69,7 +87,10 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
             $this->legacyStockItemCriteriaFactoryMock,
             $this->legacyStockItemRepositoryMock,
             $this->stockConfigurationMock,
-            $this->typeManagerMock
+            $this->typeManagerMock,
+            $this->getReservationsQuantityMock,
+            $this->stockResolverMock,
+            $this->getStockItemDataMock
         );
     }
 

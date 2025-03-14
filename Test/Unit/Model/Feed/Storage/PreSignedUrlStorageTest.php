@@ -18,6 +18,7 @@ namespace SearchSpring\Feed\Test\Unit\Model\Feed\Storage;
 
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Model\Aws\PreSignedUrl;
 use SearchSpring\Feed\Model\Feed\Storage\File\FileFactory;
 use SearchSpring\Feed\Model\Feed\Storage\File\NameGenerator;
@@ -25,6 +26,7 @@ use SearchSpring\Feed\Model\Feed\Storage\FileInterface;
 use SearchSpring\Feed\Model\Feed\Storage\FormatterInterface;
 use SearchSpring\Feed\Model\Feed\Storage\FormatterPool;
 use SearchSpring\Feed\Model\Feed\Storage\PreSignedUrlStorage;
+use SearchSpring\Feed\Model\TaskRepository;
 
 class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,6 +55,17 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
      */
     private $appConfigMock;
 
+    /**
+     * @var TaskInterface
+     */
+    private $taskInterfaceMock;
+
+    /**
+     * @var TaskRepository
+     */
+    private $taskRepositoryMock;
+    private $preSignedUrlStorage;
+
     public function setUp(): void
     {
         $this->formatterPoolMock = $this->createMock(FormatterPool::class);
@@ -60,12 +73,16 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
         $this->nameGeneratorMock = $this->createMock(NameGenerator::class);
         $this->fileFactoryMock = $this->createMock(FileFactory::class);
         $this->appConfigMock = $this->createMock(AppConfigInterface::class);
+        $this->taskInterfaceMock = $this->createMock(TaskInterface::class);
+        $this->taskRepositoryMock = $this->createMock(TaskRepository::class);
         $this->preSignedUrlStorage = new PreSignedUrlStorage(
             $this->formatterPoolMock,
             $this->preSignedUrlMock,
             $this->nameGeneratorMock,
             $this->fileFactoryMock,
             $this->appConfigMock,
+            $this->taskInterfaceMock,
+            $this->taskRepositoryMock
         );
     }
 
@@ -170,7 +187,7 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectExceptionMessage('file is not initialized yet');
         $this->expectException(\Exception::class);
-        $this->preSignedUrlStorage->addData([]);
+        $this->preSignedUrlStorage->addData([],1);
     }
 
     public function testAddDataExceptionSpecificationCase()
@@ -182,7 +199,7 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
         $file->setValue($this->preSignedUrlStorage, $fileMock);
         $this->expectExceptionMessage('specification is not initialized yet');
         $this->expectException(\Exception::class);
-        $this->preSignedUrlStorage->addData([]);
+        $this->preSignedUrlStorage->addData([],1);
     }
 
     public function testAddDataExceptionEmptyFormatCase()
@@ -201,13 +218,14 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
             ->willReturn('');
         $this->expectExceptionMessage('format cannot be empty');
         $this->expectException(\Exception::class);
-        $this->preSignedUrlStorage->addData([]);
+        $this->preSignedUrlStorage->addData([],1);
     }
 
     public function testAddData()
     {
         $testFormat = 'apformat';
         $testData = ['test' => 'data'];
+        $entityId = 1;
         $feedSpecificationMock = $this->createMock(FeedSpecificationInterface::class);
         $fileMock = $this->createMock(FileInterface::class);
         $formatterInterfaceMock = $this->createMock(FormatterInterface::class);
@@ -241,24 +259,32 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
                 'formatted' => true
             ]);
 
-        $this->preSignedUrlStorage->addData($testData);
+        $this->preSignedUrlStorage->addData($testData, $entityId);
     }
 
     public function testCommitExceptionCase()
     {
         $this->expectExceptionMessage('file is not initialized yet');
         $this->expectException(\Exception::class);
-        $this->preSignedUrlStorage->commit();
+        $this->preSignedUrlStorage->commit(1);
     }
 
     public function testCommit()
     {
         $fileMock = $this->createMock(FileInterface::class);
+        $entityId = 1;
         $feedSpecificationMock = $this->createMock(FeedSpecificationInterface::class);
         $absolutePath = 'abs/olute/path/to/file.exe';
+
         $preSignedUrlStorage = new \ReflectionClass(PreSignedUrlStorage::class);
         $file = $preSignedUrlStorage->getProperty('file');
         $file->setAccessible(true);
+
+        // Configure the feedSpecificationMock to return a valid URL
+        $feedSpecificationMock->expects($this->once())
+            ->method('getPreSignedUrl')
+            ->willReturn('sites/24b0z6/ssfeed-2621.txt.gz'); // Return a valid URL
+
         $file->setValue($this->preSignedUrlStorage, $fileMock);
         $fileMock->expects($this->once())
             ->method('commit');
@@ -277,7 +303,7 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
         $fileMock->expects($this->once())
             ->method('delete');
 
-        $this->preSignedUrlStorage->commit();
+        $this->preSignedUrlStorage->commit( $entityId );
     }
 
     public function testRollback()
