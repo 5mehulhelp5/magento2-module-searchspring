@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
 use Magento\Framework\Exception\NoSuchEntityException;
+use Psr\Log\LoggerInterface;
 
 class CompositeStockResolver implements StockResolverInterface
 {
@@ -28,13 +29,21 @@ class CompositeStockResolver implements StockResolverInterface
     private $resolvers;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * CompositeStockResolver constructor.
      * @param array $resolvers
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        array $resolvers = []
+        LoggerInterface $logger,
+        array $resolvers = [],
     ) {
         $this->resolvers = $resolvers;
+        $this->logger =  $logger;
     }
 
     /**
@@ -55,7 +64,10 @@ class CompositeStockResolver implements StockResolverInterface
             try {
                 $provider = $resolverInstance->resolve();
             } catch (NoSuchEntityException $exception) {
-                // do nothing
+                $this->logger->error(
+                    "could not resolve stock provider for feed generation",
+                    ['exception' => $exception]
+                );
             }
 
             if ($provider) {

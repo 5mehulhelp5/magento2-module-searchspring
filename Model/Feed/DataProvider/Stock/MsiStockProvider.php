@@ -34,7 +34,7 @@ use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Filesystem\DirectoryList;
-
+use Psr\Log\LoggerInterface;
 class MsiStockProvider implements StockProviderInterface
 {
     /**
@@ -77,6 +77,10 @@ class MsiStockProvider implements StockProviderInterface
      * @var Type
      */
     private $typeManager;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
 
     /**
@@ -91,6 +95,7 @@ class MsiStockProvider implements StockProviderInterface
      * @param GetReservationsQuantityInterface $getReservationsQuantity
      * @param MsiStockResolverInterface $stockResolver
      * @param GetStockItemDataInterface $getStockItemData
+     * @param LoggerInterface $logger
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -103,6 +108,7 @@ class MsiStockProvider implements StockProviderInterface
         GetReservationsQuantityInterface $getReservationsQuantity,
         MsiStockResolverInterface $stockResolver,
         GetStockItemDataInterface  $getStockItemData,
+        LoggerInterface $logger,
     ) {
         $this->storeManager = $storeManager;
         $this->websiteRepository = $websiteRepository;
@@ -114,6 +120,7 @@ class MsiStockProvider implements StockProviderInterface
         $this->getReservationsQuantity =  $getReservationsQuantity;
         $this->stockResolver =  $stockResolver;
         $this->getStockItemData =  $getStockItemData;
+        $this->logger =  $logger;
     }
 
     /**
@@ -156,6 +163,10 @@ class MsiStockProvider implements StockProviderInterface
                 $stockData = $this->getStockItemData->execute($sku, $stockId) ?? [];
                 $reservation = $this->getReservationsQuantity->execute($sku, $stockId);
             } catch (\Exception $exception) {
+                $this->logger->error(
+                    "Error processing stock data for SKU: {$sku}",
+                    ['exception' => $exception]
+                );
                 continue;
             }
 
