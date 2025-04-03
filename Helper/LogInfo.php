@@ -31,6 +31,21 @@ class LogInfo extends AbstractHelper
      */
     protected  $logger;
 
+    public const LOG = [
+        'searchspring' => 'searchspring_feed.log',
+        'exception' => 'exception.log',
+        'deleteExtensionLogFileInfo' => 'File searchspring feed log will be removed from the path',
+        'deleteExtensionLogFileRemove' => 'File searchspring feed log removed successfully',
+        'deleteExtensionLogFileError' => 'File searchspring feed log not present at the location',
+        'getExtensionLogFileInfo' => 'File searchspring feed log will be retrieved from the path',
+        'getExtensionLogFileError' => 'File searchspring feed log  not present at the location:',
+        'deleteExceptionLogFileInfo' => 'File exception log will be removed from the path',
+        'deleteExceptionLogFileRemove' => 'File exception log removed successfully from the path',
+        'deleteExceptionLogFileError' => 'File exception log not present at the location',
+        'getExceptionLogFileInfo' => 'File exception log will be removed from the path',
+        'getExceptionLogFileError' => 'File exception log not present at the location',
+    ];
+
     /**
      * Constructor.
      *
@@ -48,14 +63,14 @@ class LogInfo extends AbstractHelper
     public function deleteExtensionLogFile() : bool
     {
         $logPath = $this->directoryList->getPath(DirectoryList::LOG);
-        $logFile = $logPath . '/searchspring_feed.log';
+        $logFile = $logPath . '/'. self::LOG['searchspring'];
 
         if ($this->fileDriver->isExists($logFile)) {
-            $this->logger->info("File searchspring feed log will be removed from the path:" . $logPath);
+            $this->logger->info(self::LOG['deleteExtensionLogFileInfo']. $logPath);
             unlink($logFile);
-            $this->logger->info("File removed successfully" . $logPath . '/searchspring_feed.log');
+            $this->logger->info(self::LOG['deleteExtensionLogFileRemove'] . $logPath . '/'. self::LOG['searchspring']);
         }
-        $this->logger->error("File searchspring feed not present at the location" . $logFile);
+        $this->logger->error(self::LOG['deleteExtensionLogFileError'] . $logFile);
 
         return true;
     }
@@ -65,17 +80,17 @@ class LogInfo extends AbstractHelper
         $result = '';
 
         $logPath = $this->directoryList->getPath(DirectoryList::LOG);
-        $logFile = $logPath . '/searchspring_feed.log';
+        $logFile = $logPath . '/'. self::LOG['searchspring'];
 
         if ($this->fileDriver->isExists($logFile)) {
-            $this->logger->info("File searchspring feed log will be retrieved from the path: " . $logPath);
+            $this->logger->info(self::LOG['getExtensionLogFileInfo']. $logPath);
             $result = $this->fileDriver->fileGetContents($logFile);
 
             if (strlen($result) > 0 and $compressOutput){
                 $result = rtrim(strtr(base64_encode(gzdeflate($result, 9)), '+/', '-_'), '=');
             }
         }
-        $this->logger->error("File searchspring feed log  not present at the location" . $logPath);
+        $this->logger->error(self::LOG['getExtensionLogFileError'] . $logPath);
 
         return $result;
     }
@@ -83,14 +98,14 @@ class LogInfo extends AbstractHelper
     public function deleteExceptionLogFile() : bool
     {
         $logPath = $this->directoryList->getPath(DirectoryList::LOG);
-        $logFile = $logPath . '/exception.log';
+        $logFile = $logPath . '/'. self::LOG['exception'];
 
         if ($this->fileDriver->isExists($logFile)) {
-            $this->logger->info("File exception log will be removed from the path: " . $logPath);
+            $this->logger->info(self::LOG['deleteExceptionLogFileInfo'] . $logPath);
             unlink($logFile);
-            $this->logger->info("File removed from the path: " . $logPath);
+            $this->logger->info(self::LOG['deleteExceptionLogFileRemove'] . $logPath);
         }
-        $this->logger->error("File exception log not present at the location" . $logPath);
+        $this->logger->error(self::LOG['deleteExceptionLogFileError'] . $logPath);
 
         return true;
     }
@@ -100,17 +115,17 @@ class LogInfo extends AbstractHelper
         $result = '';
 
         $logPath = $this->directoryList->getPath(DirectoryList::LOG);
-        $logFile = $logPath . '/exception.log';
+        $logFile = $logPath . '/'. self::LOG['exception'];
 
         if ($this->fileDriver->isExists($logFile)) {
-            $this->logger->info("File exception log will be retrieved from the path: " . $logPath);
+            $this->logger->info(self::LOG['getExceptionLogFileInfo'] . $logPath);
             $result = $this->fileDriver->fileGetContents($logFile);
 
             if (strlen($result) > 0 and $compressOutput){
                 $result = rtrim(strtr(base64_encode(gzdeflate($result, 9)), '+/', '-_'), '=');
             }
         }
-        $this->logger->error("File exception log not present at the location" . $logPath);
+        $this->logger->error(self::LOG['getExceptionLogFileError'] . $logPath);
 
         return $result;
     }
