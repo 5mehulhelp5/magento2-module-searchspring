@@ -168,11 +168,6 @@ class PreSignedUrlStorage implements StorageInterface
 
         $formatter = $this->formatterPool->get($format);
         $data = $formatter->format($data, $specification);
-
-        $task = $this->taskRepository->get($id);
-        $task->setProductCount(count($data));
-        $this->taskRepository->save($task);
-
         $file->appendData($data);
     }
 

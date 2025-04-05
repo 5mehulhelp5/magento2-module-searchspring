@@ -36,6 +36,7 @@ use SearchSpring\Feed\Model\Feed\DataProviderPool;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 use SearchSpring\Feed\Model\Metric\CollectorInterface;
+use SearchSpring\Feed\Api\TaskRepositoryInterface;
 
 class GenerateFeed implements GenerateFeedInterface
 {
@@ -79,6 +80,12 @@ class GenerateFeed implements GenerateFeedInterface
     private $gcStatus = false;
 
     /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+    private $productCount = '';
+
+    /**
      * GenerateFeed constructor.
      * @param CollectionProviderInterface $collectionProvider
      * @param DataProviderPool $dataProviderPool
@@ -89,6 +96,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param ProcessorPool $afterLoadProcessorPool
      * @param CollectorInterface $metricCollector
      * @param AppConfigInterface $appConfig
+     * @param TaskRepositoryInterface $taskRepository
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -99,7 +107,8 @@ class GenerateFeed implements GenerateFeedInterface
         ContextManagerInterface $contextManager,
         ProcessorPool $afterLoadProcessorPool,
         CollectorInterface $metricCollector,
-        AppConfigInterface $appConfig
+        AppConfigInterface $appConfig,
+        TaskRepositoryInterface $taskRepository
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
@@ -110,6 +119,7 @@ class GenerateFeed implements GenerateFeedInterface
         $this->afterLoadProcessorPool = $afterLoadProcessorPool;
         $this->metricCollector = $metricCollector;
         $this->appConfig = $appConfig;
+        $this->taskRepository = $taskRepository;
     }
 
     /**
@@ -134,12 +144,14 @@ class GenerateFeed implements GenerateFeedInterface
         $metricMaxPage = $this->appConfig->getValue('product_metric_max_page') ?? 10;
         $metrics = 0;
         $this->collectMetrics('Before Start Items Generation');
+        $productCount = 0;
         while ($currentPageNumber <= $pageCount) {
             try {
                 $collection->setCurPage($currentPageNumber);
                 $collection->load();
                 $this->processAfterLoad($collection, $feedSpecification);
                 $itemsData = $this->getItemsData($collection->getItems(), $feedSpecification);
+                $productCount += count($itemsData);
                 $title = 'Products: ' . $pageSize * $metrics . ' - ' . $pageSize * ($metrics + 1);
                 $metrics++;
                 if ($metricPage === (int) $metricMaxPage) {
@@ -163,6 +175,9 @@ class GenerateFeed implements GenerateFeedInterface
             }
         }
 
+        $task = $this->taskRepository->get($id);
+        $task->setProductCount($productCount);
+        $this->taskRepository->save($task);
         $this->reset($feedSpecification, $id);
         return;
     }
