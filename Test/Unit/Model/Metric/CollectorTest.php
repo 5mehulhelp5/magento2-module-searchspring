@@ -57,6 +57,8 @@ class CollectorTest extends \PHPUnit\Framework\TestCase
      * @var LoggerInterface
      */
     private $loggerMock;
+    private $metricProviderMock;
+    private $collector;
 
     public function setUp(): void
     {

@@ -18,6 +18,7 @@ namespace SearchSpring\Feed\Test\Unit\Model\Feed\DataProvider\Stock;
 
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
+use SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockResolver;
 
 class MsiStockResolverTest extends \PHPUnit\Framework\TestCase
@@ -32,10 +33,16 @@ class MsiStockResolverTest extends \PHPUnit\Framework\TestCase
 
     private $msiStockResolver;
 
+    /**
+     * @var MsiStockProvider
+     */
+    protected $stockProviderMock;
+
     public function setUp(): void
     {
         $this->moduleManagerMock = $this->createMock(Manager::class);
-        $this->msiStockResolver = new MsiStockResolver($this->moduleManagerMock, $this->moduleList);
+        $this->stockProviderMock = $this->createMock(MsiStockProvider::class);
+        $this->msiStockResolver = new MsiStockResolver($this->moduleManagerMock,  $this->stockProviderMock ,$this->moduleList);
     }
 
     public function testResolve()

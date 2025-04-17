@@ -82,6 +82,13 @@
         </arguments>
     </type>
 
+    <type name="SearchSpring\Feed\Helper\LogInfo">
+        <arguments>
+            <argument name="directoryList" xsi:type="object">Magento\Framework\Filesystem\DirectoryList</argument>
+        </arguments>
+    </type>
+
+
     <type name="SearchSpring\Feed\Model\Task\ValidatorPool">
         <arguments>
             <argument name="validators" xsi:type="array">
@@ -217,10 +224,10 @@
 
     <type name="SearchSpring\Feed\Model\Feed\Storage\File\FileFactory">
         <arguments>
-            <argument name="fileClassPool" xsi:type="array">
-                <item name="csv" xsi:type="string">SearchSpring\Feed\Model\Feed\Storage\File\Csv</item>
-                <item name="json" xsi:type="string">SearchSpring\Feed\Model\Feed\Storage\File\Json</item>
-            </argument>
+<!--            <argument name="fileClassPool" xsi:type="array">-->
+                <argument  name="csvFile" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\File\Csv</argument>
+                <argument  name="jsonFile" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\File\Json</argument>
+<!--            </argument>-->
         </arguments>
     </type>
 

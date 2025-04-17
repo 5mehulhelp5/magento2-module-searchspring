@@ -72,6 +72,7 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
     private $appConfigMock;
 
     private $generateFeed;
+    private $metricCollectorMock;
 
     /**
      * @return void
@@ -117,6 +118,11 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
             $dataProviderMock,
             $dataProviderMockSecond,
         ];
+        // Configure the feedSpecificationMock to return a valid URL
+        $feedSpecificationMock->expects($this->once())
+            ->method('getPreSignedUrl')
+            ->willReturn('https://example.com/path/to/file.json.gz'); // Return a valid URL
+
         $feedSpecificationMock->expects($this->once())
             ->method('getFormat')
             ->willReturn($format);
@@ -333,7 +339,7 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
             ->with(CollectorInterface::CODE_PRODUCT_FEED);
         $this->contextManagerMock->expects($this->once())
             ->method('resetContext');
-        $this->generateFeed->execute($feedSpecificationMock);
+        $this->generateFeed->execute($feedSpecificationMock, 1);
     }
 
     public function testExecuteExceptionCase()
@@ -346,6 +352,10 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
         $feedSpecificationMock->expects($this->once())
             ->method('getFormat')
             ->willReturn($format);
+        // Configure getPreSignedUrl() to return a valid URL
+        $feedSpecificationMock->expects($this->once())
+            ->method('getPreSignedUrl')
+            ->willReturn('https://example.com/path/to/file.json.gz');
         $this->storageMock->expects($this->once())
             ->method('isSupportedFormat')
             ->with($format)
@@ -392,7 +402,7 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
         $this->storageMock->expects($this->once())
             ->method('rollback');
         $this->expectException(\Exception::class);
-        $this->generateFeed->execute($feedSpecificationMock);
+        $this->generateFeed->execute($feedSpecificationMock,1);
     }
 
     public function testExecuteExceptionCaseOnUnsupportedFormat()
@@ -402,12 +412,16 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
         $feedSpecificationMock->expects($this->once())
             ->method('getFormat')
             ->willReturn($format);
+        // Configure getPreSignedUrl() to return a valid URL
+        $feedSpecificationMock->expects($this->once())
+            ->method('getPreSignedUrl')
+            ->willReturn('https://example.com/path/to/file.json.gz');
         $this->storageMock->expects($this->once())
             ->method('isSupportedFormat')
             ->with($format)
             ->willReturn(false);
         $this->expectExceptionMessage('format is not supported format');
         $this->expectException(\Exception::class);
-        $this->generateFeed->execute($feedSpecificationMock);
+        $this->generateFeed->execute($feedSpecificationMock,1);
     }
 }

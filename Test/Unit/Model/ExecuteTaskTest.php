@@ -164,7 +164,9 @@ class ExecuteTaskTest extends \PHPUnit\Framework\TestCase
         $this->loggerMock->expects($this->once())
             ->method('error')
             ->withAnyParameters()
-            ->willReturn(0);
+            ->willReturnCallback(function () {
+                // Do nothing (void method)
+            });
         $taskErrorMock->expects($this->once())
             ->method('setMessage')
             ->with('exception message')

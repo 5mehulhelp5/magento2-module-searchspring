@@ -76,6 +76,8 @@ class DataProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $attributesProviderMock;
 
+    private $dataProvider;
+
     public function setUp(): void
     {
         $this->getAttributesCollectionMock = $this->createMock(GetAttributesCollection::class);

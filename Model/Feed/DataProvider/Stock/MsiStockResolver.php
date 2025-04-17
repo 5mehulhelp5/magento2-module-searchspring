@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
 
@@ -28,6 +27,11 @@ class MsiStockResolver implements StockResolverInterface
      * @var Manager
      */
     private $moduleManager;
+
+    /**
+     * @var MsiStockProvider
+     */
+    protected $stockProvider;
 
     private $moduleList = [
         'Magento_InventoryReservationsApi',
@@ -39,13 +43,17 @@ class MsiStockResolver implements StockResolverInterface
      * MsiStockResolver constructor.
      * @param Manager $moduleManager
      * @param array $moduleList
+     * @param MsiStockProvider $stockProvider
      */
     public function __construct(
         Manager $moduleManager,
-        array $moduleList = []
+        MsiStockProvider $stockProvider,
+        array $moduleList = [],
+
     ) {
         $this->moduleManager = $moduleManager;
         $this->moduleList = array_merge($this->moduleList, $moduleList);
+        $this->stockProvider = $stockProvider;
     }
 
     /**
@@ -57,8 +65,7 @@ class MsiStockResolver implements StockResolverInterface
         if (!$this->isMsiEnabled()) {
             throw new NoSuchEntityException(__('MSI is not installed'));
         }
-
-        return ObjectManager::getInstance()->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider');
+        return $this->stockProvider;
     }
 
     /**

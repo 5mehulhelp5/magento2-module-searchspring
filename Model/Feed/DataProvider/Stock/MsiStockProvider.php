@@ -33,7 +33,8 @@ use Magento\InventorySalesApi\Api\StockResolverInterface as MsiStockResolverInte
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
-
+use Magento\Framework\Filesystem\DirectoryList;
+use Psr\Log\LoggerInterface;
 class MsiStockProvider implements StockProviderInterface
 {
     /**
@@ -76,6 +77,11 @@ class MsiStockProvider implements StockProviderInterface
      * @var Type
      */
     private $typeManager;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
 
     /**
      * MsiStockProvider constructor.
@@ -86,6 +92,10 @@ class MsiStockProvider implements StockProviderInterface
      * @param StockItemRepositoryInterface $legacyStockItemRepository
      * @param StockConfigurationInterface $stockConfiguration
      * @param Type $typeManager
+     * @param GetReservationsQuantityInterface $getReservationsQuantity
+     * @param MsiStockResolverInterface $stockResolver
+     * @param GetStockItemDataInterface $getStockItemData
+     * @param LoggerInterface $logger
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -94,7 +104,11 @@ class MsiStockProvider implements StockProviderInterface
         StockItemCriteriaInterfaceFactory $legacyStockItemCriteriaFactory,
         StockItemRepositoryInterface $legacyStockItemRepository,
         StockConfigurationInterface $stockConfiguration,
-        Type $typeManager
+        Type $typeManager,
+        GetReservationsQuantityInterface $getReservationsQuantity,
+        MsiStockResolverInterface $stockResolver,
+        GetStockItemDataInterface  $getStockItemData,
+        LoggerInterface $logger,
     ) {
         $this->storeManager = $storeManager;
         $this->websiteRepository = $websiteRepository;
@@ -103,6 +117,10 @@ class MsiStockProvider implements StockProviderInterface
         $this->legacyStockItemRepository = $legacyStockItemRepository;
         $this->stockConfiguration = $stockConfiguration;
         $this->typeManager = $typeManager;
+        $this->getReservationsQuantity =  $getReservationsQuantity;
+        $this->stockResolver =  $stockResolver;
+        $this->getStockItemData =  $getStockItemData;
+        $this->logger =  $logger;
     }
 
     /**
@@ -126,7 +144,6 @@ class MsiStockProvider implements StockProviderInterface
             return [];
         }
 
-        $this->init();
         $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
         $website = $this->websiteRepository->getById($websiteId);
         $stock = $this->stockResolver->execute(SalesChannelInterface::TYPE_WEBSITE, $website->getCode());
@@ -145,6 +162,10 @@ class MsiStockProvider implements StockProviderInterface
                 $stockData = $this->getStockItemData->execute($sku, $stockId) ?? [];
                 $reservation = $this->getReservationsQuantity->execute($sku, $stockId);
             } catch (\Exception $exception) {
+                $this->logger->error(
+                    "Error processing stock data for SKU: {$sku}",
+                    ['exception' => $exception]
+                );
                 continue;
             }
 
@@ -159,26 +180,6 @@ class MsiStockProvider implements StockProviderInterface
         }
 
         return $result;
-    }
-
-    /**
-     *
-     */
-    private function init() : void
-    {
-        // we cannot use constructor because MSI module codebase can be removed via composer
-        if (is_null($this->getReservationsQuantity)) {
-            $this->getReservationsQuantity = ObjectManager::getInstance()
-                ->get('Magento\InventoryReservationsApi\Model\GetReservationsQuantityInterface');
-        }
-        if (is_null($this->stockResolver)) {
-            $this->stockResolver =
-                ObjectManager::getInstance()->get('Magento\InventorySalesApi\Api\StockResolverInterface');
-        }
-        if (is_null($this->getStockItemData)) {
-            $this->getStockItemData =
-                ObjectManager::getInstance()->get('Magento\InventorySalesApi\Model\GetStockItemDataInterface');
-        }
     }
 
     /**

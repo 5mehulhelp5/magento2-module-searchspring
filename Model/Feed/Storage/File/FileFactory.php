@@ -27,16 +27,22 @@ class FileFactory
     /**
      * @var array
      */
-    private $fileClassPool;
+    private array $fileClassPool;
 
     /**
      * FileFactory constructor.
-     * @param array $fileClassPool
+     * @param FileInterface $csvFile
+     * @param FileInterface $jsonFile
      */
     public function __construct(
-        array $fileClassPool = []
+        FileInterface $csvFile,
+        FileInterface $jsonFile,
     ) {
-        $this->fileClassPool = $fileClassPool;
+       // $this->fileClassPool = $fileClassPool;
+        $this->fileClassPool = [
+            'csv' => $csvFile,
+            'json' => $jsonFile,
+        ];
     }
 
     /**
@@ -46,13 +52,13 @@ class FileFactory
      */
     public function create(string $format) : FileInterface
     {
-        $fileClass = $this->fileClassPool[$format] ?? null;
-        if (!$fileClass) {
+        $file = $this->fileClassPool[$format] ?? null;
+        if (!$file) {
             throw new Exception('fileClass is null');
         }
 
-        /** @var FileInterface $file */
-        $file = ObjectManager::getInstance()->create($fileClass);
+//        /** @var FileInterface $file */
+//        $file = ObjectManager::getInstance()->create($fileClass);
         return $file;
     }
 

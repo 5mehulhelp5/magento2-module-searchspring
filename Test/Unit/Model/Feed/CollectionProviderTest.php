@@ -41,6 +41,10 @@ class CollectionProviderTest extends \PHPUnit\Framework\TestCase
 
     private $pricesModifierMock;
 
+    private $collectionFactoryMock; // Declare this property
+    private $collectionProvider; // Declare this property
+
+
     public function setUp(): void
     {
         $this->storeModifierMock = $this->createMock(StoreModifier::class);
