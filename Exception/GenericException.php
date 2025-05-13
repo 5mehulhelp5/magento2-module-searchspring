@@ -33,7 +33,7 @@ class GenericException extends \Exception
     public function __construct(
         $message = "",
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         if (!$code) {
             $code = static::CODE;

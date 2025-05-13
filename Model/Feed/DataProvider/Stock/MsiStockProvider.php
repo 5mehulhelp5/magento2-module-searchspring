@@ -202,7 +202,7 @@ class MsiStockProvider implements StockProviderInterface
      * @param StockItemInterface|null $configuration
      * @return bool
      */
-    private function getIsInStock(array $stockData, float $reservation, StockItemInterface $configuration = null) : bool
+    private function getIsInStock(array $stockData, float $reservation, ?StockItemInterface $configuration = null) : bool
     {
         if (!$configuration) {
             return false;

@@ -229,7 +229,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param array|null $itemsData
      * @param bool $print
      */
-    private function collectMetrics(string $title, array $itemsData = null, bool $print = true) : void
+    private function collectMetrics(string $title, ?array $itemsData = null, bool $print = true) : void
     {
         $data = [];
         try {

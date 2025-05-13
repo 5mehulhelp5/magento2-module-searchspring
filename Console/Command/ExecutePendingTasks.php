@@ -67,7 +67,7 @@ class ExecutePendingTasks extends Command
         State $state,
         CliOutput $cliOutput,
         CollectorInterface $metricCollector,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
         $this->executePendingTasksFactory = $executePendingTasksFactory;

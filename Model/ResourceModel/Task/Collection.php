@@ -56,8 +56,8 @@ class Collection extends AbstractCollection
         ManagerInterface $eventManager,
         Snapshot $entitySnapshot,
         LoadErrors $loadErrors,
-        AdapterInterface $connection = null,
-        AbstractDb $resource = null
+        ?AdapterInterface $connection = null,
+        ?AbstractDb $resource = null
     ) {
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $entitySnapshot, $connection, $resource);
         $this->loadErrors = $loadErrors;

@@ -69,8 +69,8 @@ class Task extends AbstractExtensibleModel implements TaskInterface
         DateTime $dateTime,
         LoadErrors $loadErrors,
         SerializerInterface $serializer,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $resource, $resourceCollection, $data);

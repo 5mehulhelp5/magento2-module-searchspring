@@ -93,7 +93,7 @@ class GetChildCollection
      * @param int|null $storeId
      * @return Collection
      */
-    public function execute(array $productIds, array $attributeCodes = [], int $storeId = null) : Collection
+    public function execute(array $productIds, array $attributeCodes = [], ?int $storeId = null) : Collection
     {
         /** @var LinkModel $links */
         $links = $this->linkFactory->create(['productIds' => $productIds]);

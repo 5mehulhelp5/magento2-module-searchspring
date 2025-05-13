@@ -219,7 +219,7 @@ abstract class FileAbstract implements FileInterface
      * @param string|null $extension
      * @return string
      */
-    protected function buildPath(string $fileName, string $extension = null) : string
+    protected function buildPath(string $fileName, ?string $extension = null) : string
     {
         $path = $this->subDirectory . '/' . $fileName;
         if ($extension) {

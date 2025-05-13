@@ -33,7 +33,7 @@ class UniqueTaskException extends GenericException
     public function __construct(
         $message = "",
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         if (!$message) {
             $message = (string) __('Task is not unique');
