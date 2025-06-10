@@ -131,7 +131,7 @@ class MediaGalleryProvider implements DataProviderInterface
         Product $product,
         string $type,
         MediaGallerySpecificationInterface $mediaGallerySpecification,
-        string $file = null
+        ?string $file = null
     ) : string {
         $imageHelper = $this->imageHelper->init($product, $type);
 

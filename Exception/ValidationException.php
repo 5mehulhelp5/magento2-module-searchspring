@@ -33,7 +33,7 @@ class ValidationException extends GenericException
     public function __construct(
         $messages = [],
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         $message = '';
         foreach ($messages as $error) {

@@ -40,7 +40,7 @@ interface TaskRepositoryInterface
      * @return SearchSpring\Feed\Api\Data\TaskSearchResultsInterface
      * @throws LocalizedException
      */
-    public function getList(SearchCriteriaInterface $searchCriteria = null) : TaskSearchResultsInterface;
+    public function getList(?SearchCriteriaInterface $searchCriteria = null) : TaskSearchResultsInterface;
 
     /**
      * @param TaskInterface $task

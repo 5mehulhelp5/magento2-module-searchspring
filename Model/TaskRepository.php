@@ -117,7 +117,7 @@ class TaskRepository implements TaskRepositoryInterface
      * @throws LocalizedException
      * @return TaskSearchResultsInterface
      */
-    public function getList(SearchCriteriaInterface $searchCriteria = null): TaskSearchResultsInterface
+    public function getList(?SearchCriteriaInterface $searchCriteria = null): TaskSearchResultsInterface
     {
         if (!$searchCriteria) {
             $searchCriteria = $this->searchCriteriaBuilder->create();
