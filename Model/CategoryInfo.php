@@ -2,83 +2,41 @@
 
 namespace SearchSpring\Feed\Model;
 
-use Magento\Catalog\Model\Category;
-use Magento\Catalog\Model\CategoryFactory;
-use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\CategoryInfoInterface as CategoryInfoApi;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use SearchSpring\Feed\Helper\CategoryList;
 
 class CategoryInfo implements CategoryInfoApi
 {
-    protected $categoryRepository;
-    protected $categoryFactory;
-    protected $categoryCollectionFactory;
+    private $categoryHelper;
 
+    /**
+     * @param CategoryList $categoryHelper
+     */
     public function __construct(
-        CategoryRepositoryInterface $categoryRepository,
-        CategoryFactory             $categoryFactory,
-        CategoryCollectionFactory   $categoryCollectionFactory,
+        CategoryList $categoryHelper,
     )
     {
-        $this->categoryRepository = $categoryRepository;
-        $this->categoryFactory = $categoryFactory;
-        $this->categoryCollectionFactory = $categoryCollectionFactory;
+        $this->categoryHelper = $categoryHelper;
     }
 
     /**
      * @param bool $activeOnly
      * @param string $delimiter
+     * @param int $currentPage
+     * @param int $pageSize
      * @return array
-     * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
-    public function getAllCategories(bool $activeOnly = true, string $delimiter = '>'): array
+    public function getAllCategories(bool $activeOnly = true, string $delimiter = '>', int $currentPage = 1, int $pageSize = 15): array
     {
-        $categories = [];
-
-        // Get the category collection
-        $categoryCollection = $this->categoryCollectionFactory->create();
-        $categoryCollection->addAttributeToSelect('*'); // Load all attributes
-
-        if ($activeOnly) {
-            $categoryCollection->addIsActiveFilter(); // Only get active categories
-        }
-
-        // Loop through the categories and collect the relevant data
-        foreach ($categoryCollection as $category) {
-            $categories[] = [
-                'ID' => $category->getId(),
-                'Name' => $category->getName(),
-                'PageLink' => $category->getUrl(),
-                'ImageLink' => $category->getImageUrl(),
-                'ParentId' => $category->getParentId(),
-                'DisplayName' => $category->getName(),
-                'FullHierarchy' => $this->getFullCategoryHierarchy($category, $delimiter),
-                'NumProducts' => $category->getProductCount(),
-            ];
-        }
-
-        return $categories;
-    }
-
-    /**
-     * Get full hierarchy of a category
-     *
-     * @param Category $category
-     * @param string $delimiter
-     * @return string
-     * @throws NoSuchEntityException
-     */
-    private function getFullCategoryHierarchy(Category $category, string $delimiter): string
-    {
-        $pathIds = $category->getPathIds();
-        $categoryHierarchy = [];
-
-        foreach ($pathIds as $pathId) {
-            $categoryEntity = $this->categoryRepository->get($pathId);
-            $categoryHierarchy[] = $categoryEntity->getName();
-        }
-
-        return implode($delimiter, $categoryHierarchy);
+        return [
+            'data' => [
+                'categories' => $this->categoryHelper->getList($activeOnly, $delimiter, $currentPage, $pageSize),
+                'total' => $this->categoryHelper->getTotalCategories(),
+                'currentPage' => $currentPage,
+                'pageSize' => $pageSize
+            ]
+        ];
     }
 }

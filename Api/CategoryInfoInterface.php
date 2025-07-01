@@ -9,7 +9,9 @@ interface CategoryInfoInterface
      *
      * @param bool $activeOnly
      * @param string $delimiter
+     * @param int $currentPage
+     * @param int $pageSize
      * @return array
      */
-    public function getAllCategories(bool $activeOnly = true, string $delimiter = '>'): array;
+    public function getAllCategories(bool $activeOnly = true, string $delimiter = '>', int $currentPage = 1, int $pageSize = 15): array;
 }
