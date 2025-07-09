@@ -68,7 +68,7 @@ class CategoryList extends AbstractHelper
                 'Name' => $category->getName(),
                 'PageLink' => $category->getUrl(),
                 'ImageLink' => $category->getImageUrl() ?: "",
-                'ImageLink2' => $category->getImageUrl() ?: null,
+                'ImageLink2' => $category->getImageUrl() ?: 'null',
                 'ParentId' => $category->getParentId(),
                 'DisplayName' => $category->getName(),
                 'FullHierarchy' => $this->getFullCategoryHierarchy($category, $delimiter),
