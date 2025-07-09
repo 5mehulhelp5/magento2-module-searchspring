@@ -69,10 +69,10 @@ class CategoryList extends AbstractHelper
                 'PageLink' => $category->getUrl(),
                 'ImageLink' => $category->getImageUrl(),
                 'ParentId' => $category->getParentId(),
-                'IsActive' => (int)$category->getIsActive(),
                 'DisplayName' => $category->getName(),
                 'FullHierarchy' => $this->getFullCategoryHierarchy($category, $delimiter),
                 'NumProducts' => $category->getProductCount(),
+                'IsActive' => (int)$category->getIsActive(),
             ];
         }
         $this->total = count($categories);
