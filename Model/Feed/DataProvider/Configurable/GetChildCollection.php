@@ -21,9 +21,10 @@ namespace SearchSpring\Feed\Model\Feed\DataProvider\Configurable;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
-use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Product\Collection;
-use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Product\CollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Psr\Log\LoggerInterface;
+
 class GetChildCollection
 {
     /**
@@ -107,11 +108,18 @@ class GetChildCollection
             ['in' => $this->status->getVisibleStatusIds()]
         );
 
-        if (!empty($productIds)) {
-            $collection->addFieldToFilter('entity_id', ['in' => $productIds]);
-        }
+        $collection->getSelect()
+            ->join(
+                ['sl' => $collection->getTable('catalog_product_super_link')],
+                'e.entity_id = sl.product_id',
+                []
+            )
+            ->where('sl.parent_id IN (?)', $productIds);
 
         $collection->addPriceData();
+        $collection->getSelect()
+            ->columns(['parent_id' => 'sl.parent_id']);
+        $collection->load();
 
         return $collection;
     }
