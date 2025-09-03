@@ -73,6 +73,8 @@
                 type="SearchSpring\Feed\Model\Aws\Client\Response"/>
     <preference for="SearchSpring\Feed\Api\CategoryInfoInterface"
                 type="SearchSpring\Feed\Model\CategoryInfo"/>
+    <preference for="SearchSpring\Feed\Service\Normalization\ValueNormalizerInterface"
+                type="SearchSpring\Feed\Service\Normalization\ValueNormalizer"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -360,6 +362,12 @@
                     <item name="file_size" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\FileSizeProvider</item>
                 </item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Service\Normalization\ValueNormalizerInterface">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>
     </type>
 

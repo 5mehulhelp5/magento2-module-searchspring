@@ -21,11 +21,12 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Framework\Pricing\Price\PriceInterface;
 use Magento\Framework\Pricing\PriceInfoInterface;
+use PHPUnit\Framework\TestCase;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
 
-class GetChildProductsDataTest extends \PHPUnit\Framework\TestCase
+class GetChildProductsDataTest extends TestCase
 {
     private $valueProcessorMock;
 

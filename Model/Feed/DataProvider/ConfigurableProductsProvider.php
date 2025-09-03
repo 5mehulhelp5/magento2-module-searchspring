@@ -21,6 +21,7 @@ namespace SearchSpring\Feed\Model\Feed\DataProvider;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Product\BuildChildProductInfo;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
@@ -38,20 +39,29 @@ class ConfigurableProductsProvider implements DataProviderInterface
     private $provider;
 
     /**
+     * @var BuildChildProductInfo
+     */
+    private $buildChildProductInfo;
+
+    /**
      * @param GetChildProductsData $getChildProductsData
      * @param DataProvider $provider
+     * @param BuildChildProductInfo $buildChildProductInfo
      */
     public function __construct(
         GetChildProductsData $getChildProductsData,
-        DataProvider $provider
+        DataProvider $provider,
+        BuildChildProductInfo $buildChildProductInfo
     ) {
         $this->getChildProductsData = $getChildProductsData;
         $this->provider = $provider;
+        $this->buildChildProductInfo = $buildChildProductInfo;
     }
 
     /**
      * @param array $products
      * @param FeedSpecificationInterface $feedSpecification
+     *
      * @return array
      * @throws LocalizedException
      */
@@ -86,6 +96,15 @@ class ConfigurableProductsProvider implements DataProviderInterface
             $product = array_merge(
                 $product,
                 $this->getChildProductsData->getProductData(
+                    $product,
+                    $childProducts[$id],
+                    $configurableAttributes[$id],
+                    $feedSpecification
+                )
+            );
+            $product = array_merge(
+                $product,
+                $this->buildChildProductInfo->execute(
                     $product,
                     $childProducts[$id],
                     $configurableAttributes[$id],
