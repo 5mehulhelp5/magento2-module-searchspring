@@ -134,7 +134,7 @@ class GetChildCollection
                 'message' =>
                     sprintf(
                         'Query: %s',
-                        $collection->getSelect()->__toString(),
+                        $collection->getSelect()->__toString()
                     ),
                 'parentIds' => $parentIds,
                 'attributeCodes' => $attributeCodes,
