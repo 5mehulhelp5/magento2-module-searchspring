@@ -58,39 +58,43 @@ class GetChildCollection
     }
 
     /**
-     * @param Product[] $products
+     * @param Product[] $parentProducts
      * @param string[] $attributeCodes
+     *
      * @return Collection
      */
     public function execute(
-        array $products,
+        array $parentProducts,
         array $attributeCodes = []
-    ) : Collection {
+    ): Collection {
         $collection = $this->collectionFactory->create();
 
-        $productIds = [];
-        $duplicateIds = []; // Array to store duplicates
-        $seenIds = []; // Array to track seen IDs
+        $parentIds = [];
+        $duplicateParentIds = [];
+        $seenParentIds = [];
 
-        foreach ($products as $product) {
-            $productId = $product->getId();
-
-            if (in_array($productId, $seenIds)) {
-                // If  already seen this ID, add it to duplicates
-                $duplicateIds[] = $productId;
+        foreach ($parentProducts as $parentProduct) {
+            $parentProductId = $parentProduct->getId();
+            if (in_array($parentProductId, $seenParentIds)) {
+                $duplicateParentIds[] = $parentProductId;
             } else {
-                // Otherwise, add it to the seen IDs and product IDs
-                $seenIds[] = $productId;
-                $productIds[] = $productId;
+                $seenParentIds[] = $parentProductId;
+                $parentIds[] = $parentProductId;
             }
         }
 
-        // Log duplicates if any
-        if (!empty($duplicateIds)) {
-            $this->logger->warning('Duplicate product IDs found: ' . implode(', ', $duplicateIds));
+        if (!empty($duplicateParentIds)) {
+            $this->logger->warning(
+                'Duplicate parent IDs found, keeps only unique IDs for child product collection.',
+                [
+                    'method' => __METHOD__,
+                    'parentIds' => $parentIds,
+                    'duplicateParentIds' => $duplicateParentIds,
+                ]
+            );
         }
 
-        $productIds = array_unique($productIds);
+        $parentIds = array_unique($parentIds);
 
         $defaultAttributes = [
             ProductInterface::STATUS,
@@ -98,28 +102,44 @@ class GetChildCollection
             ProductInterface::NAME,
             'special_price',
             'special_to_date',
-            'special_from_date'
+            'special_from_date',
         ];
 
-        $attributeCodes = array_unique(array_merge($attributeCodes, $defaultAttributes));
+        $attributeCodes = array_unique(
+            array_merge($attributeCodes, $defaultAttributes)
+        );
+
         $collection->addAttributeToSelect($attributeCodes);
         $collection->addAttributeToFilter(
             ProductInterface::STATUS,
             ['in' => $this->status->getVisibleStatusIds()]
         );
-
         $collection->getSelect()
             ->join(
-                ['sl' => $collection->getTable('catalog_product_super_link')],
+                [
+                    'sl' => $collection->getTable('catalog_product_super_link'),
+                ],
                 'e.entity_id = sl.product_id',
                 []
             )
-            ->where('sl.parent_id IN (?)', $productIds);
-
+            ->where('sl.parent_id IN (?)', $parentIds);
         $collection->addPriceData();
-        $collection->getSelect()
-            ->columns(['parent_id' => 'sl.parent_id']);
+        $collection->getSelect()->columns(['parent_id' => 'sl.parent_id']);
         $collection->load();
+
+        $this->logger->debug(
+            'ConfigurableChildEntityCollectionProvider',
+            [
+                'method' => __METHOD__,
+                'message' =>
+                    sprintf(
+                        'Query: %s',
+                        $collection->getSelect()->__toString(),
+                    ),
+                'parentIds' => $parentIds,
+                'attributeCodes' => $attributeCodes,
+            ]
+        );
 
         return $collection;
     }
