@@ -40,13 +40,8 @@ class BuildChildProductInfoTest extends TestCase
         $this->spec = $this->getMockBuilder(FeedSpecificationInterface::class)->getMock();
     }
 
-    private function makeProduct(
-        int $id,
-        string $sku,
-        int $status = 1,
-        bool $salable = true,
-        array $data = []
-    ): Product {
+    private function makeProduct(int $id, string $sku, int $status = 1, bool $salable = true, array $data = []): Product
+    {
         $product = $this->getMockBuilder(Product::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getId', 'getSku', 'getStatus', 'isSalable', 'getData'])
@@ -57,7 +52,9 @@ class BuildChildProductInfoTest extends TestCase
         $product->method('getStatus')->willReturn($status);
         $product->method('isSalable')->willReturn($salable);
         $product->method('getData')->willReturnCallback(function ($key) use ($data) {
-            return array_key_exists($key, $data) ? $data[$key] : null;
+            return array_key_exists($key, $data)
+                ? $data[$key]
+                : null;
         });
 
         return $product;
@@ -69,10 +66,11 @@ class BuildChildProductInfoTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getAttributeCode', 'getStoreLabel', 'getFrontendLabel'])
             ->getMock();
-
         $attr->method('getAttributeCode')->willReturn($code);
-        $attr->method('getStoreLabel')->willReturn($storeLabel ?: null);
-        $attr->method('getFrontendLabel')->willReturn($frontendLabel ?: null);
+        $attr->method('getStoreLabel')->willReturn($storeLabel
+            ?: null);
+        $attr->method('getFrontendLabel')->willReturn($frontendLabel
+            ?: null);
 
         return $attr;
     }
@@ -83,9 +81,9 @@ class BuildChildProductInfoTest extends TestCase
 
         $provider = $this->getMockBuilder(PriceProviderInterface::class)->getMock();
         $provider->method('getPrices')->willReturn([
-            PricesProvider::FINAL_PRICE_KEY    => 4000.0,
-            PricesProvider::MAX_PRICE_KEY      => 4000.0,
-            PricesProvider::REGULAR_PRICE_KEY  => 5000.0,
+            PricesProvider::FINAL_PRICE_KEY => 4000.0,
+            PricesProvider::MAX_PRICE_KEY => 4000.0,
+            PricesProvider::REGULAR_PRICE_KEY => 5000.0,
         ]);
         $this->resolver->method('resolve')->willReturn($provider);
 
@@ -135,7 +133,7 @@ class BuildChildProductInfoTest extends TestCase
         $provider = $this->getMockBuilder(PriceProviderInterface::class)->getMock();
         $provider->method('getPrices')->willReturn([
             PricesProvider::FINAL_PRICE_KEY => 111.0,
-            PricesProvider::MAX_PRICE_KEY   => 222.0,
+            PricesProvider::MAX_PRICE_KEY => 222.0,
         ]);
         $this->resolver->method('resolve')->willReturn($provider);
 
@@ -228,7 +226,8 @@ class BuildChildProductInfoTest extends TestCase
         $this->spec->method('getIncludeOutOfStock')->willReturn(true);
         $this->spec->method('getIncludeTierPricing')->willReturn(false);
 
-        // Since includeTierPricing=false, tier_price must be skipped entirely
+        // normalizer would have returned normalized arrays if called,
+        // but since includeTierPricing=false, it should never be used for tier_price
         $this->normalizer->expects($this->never())->method('normalize');
 
         $sut = new BuildChildProductInfo(
@@ -249,23 +248,23 @@ class BuildChildProductInfoTest extends TestCase
     {
         $child = $this->makeProduct(10, 'sku-10', 1, true, [
             'special_price' => ' 4000 ', // EAV-backed
-            'cost' => 3000,              // EAV-backed
+            'cost' => 3000,     // EAV-backed
         ]);
 
-        $attrPrice        = $this->makeAttribute('price', 'Price');
-        $attrFinal        = $this->makeAttribute('final_price', 'Final Price');
-        $attrMinimal      = $this->makeAttribute('minimal_price', 'Minimal Price');
-        $attrMaximal      = $this->makeAttribute('maximal_price', 'Maximal Price');
+        $attrPrice = $this->makeAttribute('price', 'Price');
+        $attrFinal = $this->makeAttribute('final_price', 'Final Price');
+        $attrMinimal = $this->makeAttribute('minimal_price', 'Minimal Price');
+        $attrMaximal = $this->makeAttribute('maximal_price', 'Maximal Price');
         $attrSpecialPrice = $this->makeAttribute('special_price', 'Special Price');
-        $attrCost         = $this->makeAttribute('cost', 'Cost');
+        $attrCost = $this->makeAttribute('cost', 'Cost');
 
         $attrs = [$attrPrice, $attrFinal, $attrMinimal, $attrMaximal, $attrSpecialPrice, $attrCost];
 
         $provider = $this->getMockBuilder(PriceProviderInterface::class)->getMock();
         $provider->method('getPrices')->willReturn([
-            PricesProvider::FINAL_PRICE_KEY    => 4000.0,
-            PricesProvider::MAX_PRICE_KEY      => 4000.0,
-            PricesProvider::REGULAR_PRICE_KEY  => 5000.0,
+            PricesProvider::FINAL_PRICE_KEY => 4000.0,
+            PricesProvider::MAX_PRICE_KEY => 4000.0,
+            PricesProvider::REGULAR_PRICE_KEY => 5000.0,
         ]);
         $this->resolver->method('resolve')->willReturn($provider);
 
@@ -274,9 +273,11 @@ class BuildChildProductInfoTest extends TestCase
         $this->spec->method('getIncludeOutOfStock')->willReturn(true);
         $this->spec->method('getIncludeTierPricing')->willReturn(false);
 
-        // Normalize trims string; class then converts numeric string -> float
+        // Non-price attributes won't be used here; normalizer only for special_price/cost
         $this->normalizer->method('normalize')->willReturnCallback(function ($v) {
-            return is_string($v) ? trim($v) : $v;
+            return is_string($v)
+                ? trim($v)
+                : $v;
         });
 
         $sut = new BuildChildProductInfo(
@@ -293,14 +294,14 @@ class BuildChildProductInfoTest extends TestCase
         $this->assertSame(4000.0, $row['minimal_price']);
         $this->assertSame(4000.0, $row['maximal_price']);
 
-        // attributes[] includes provider-backed + EAV-backed (special_price becomes float)
+        // attributes[] should include provider-backed + EAV-backed
         $this->assertEquals([
-            ['code' => 'price',         'label' => 'Price',         'value' => 5000.0],
-            ['code' => 'final_price',   'label' => 'Final Price',   'value' => 4000.0],
+            ['code' => 'price', 'label' => 'Price', 'value' => 5000.0],
+            ['code' => 'final_price', 'label' => 'Final Price', 'value' => 4000.0],
             ['code' => 'minimal_price', 'label' => 'Minimal Price', 'value' => 4000.0],
             ['code' => 'maximal_price', 'label' => 'Maximal Price', 'value' => 4000.0],
-            ['code' => 'special_price', 'label' => 'Special Price', 'value' => 4000.0],
-            ['code' => 'cost',          'label' => 'Cost',          'value' => 3000],
+            ['code' => 'special_price', 'label' => 'Special Price', 'value' => '4000'],
+            ['code' => 'cost', 'label' => 'Cost', 'value' => 3000],
         ], $row['attributes']);
     }
 
@@ -317,13 +318,17 @@ class BuildChildProductInfoTest extends TestCase
         $this->spec->method('getIncludeOutOfStock')->willReturn(true);
         $this->spec->method('getIncludeTierPricing')->willReturn(false);
 
-        $this->valueProcessor->method('getValue')->willReturnCallback(function ($attribute, $raw) {
-            return $raw;
-        });
+        $this->valueProcessor->method('getValue')
+            ->willReturnCallback(function ($attribute, $raw) {
+                return $raw;
+            });
 
-        $this->normalizer->method('normalize')->willReturnCallback(function ($v) {
-            return is_string($v) ? trim($v) : $v;
-        });
+        $this->normalizer->method('normalize')
+            ->willReturnCallback(function ($v) {
+                return is_string($v)
+                    ? trim($v)
+                    : $v;
+            });
 
         $sut = new BuildChildProductInfo(
             $this->valueProcessor,

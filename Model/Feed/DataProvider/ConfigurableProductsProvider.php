@@ -19,6 +19,8 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\DataProvider;
 
 use Magento\Catalog\Model\Product;
+use Magento\Framework\DataObject;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\BuildChildProductInfo;
@@ -42,20 +44,25 @@ class ConfigurableProductsProvider implements DataProviderInterface
      * @var BuildChildProductInfo
      */
     private $buildChildProductInfo;
+    /** @var EventManager */
+    private $eventManager;
 
     /**
      * @param GetChildProductsData $getChildProductsData
      * @param DataProvider $provider
      * @param BuildChildProductInfo $buildChildProductInfo
+     * @param EventManager $eventManager
      */
     public function __construct(
         GetChildProductsData $getChildProductsData,
         DataProvider $provider,
-        BuildChildProductInfo $buildChildProductInfo
+        BuildChildProductInfo $buildChildProductInfo,
+        EventManager $eventManager
     ) {
         $this->getChildProductsData = $getChildProductsData;
         $this->provider = $provider;
         $this->buildChildProductInfo = $buildChildProductInfo;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -65,7 +72,10 @@ class ConfigurableProductsProvider implements DataProviderInterface
      * @return array
      * @throws LocalizedException
      */
-    public function getData(array $products, FeedSpecificationInterface $feedSpecification): array
+    public function getData(
+        array $products,
+        FeedSpecificationInterface $feedSpecification
+    ): array
     {
         $configurableProducts = $this->provider->getConfigurableProducts($products);
 
@@ -93,6 +103,19 @@ class ConfigurableProductsProvider implements DataProviderInterface
                 continue;
             }
 
+            $beforeProductTransport = new DataObject([
+                'product' => $product,
+                'product_model' => $productModel,
+                'child_products' => $childProducts[$id],
+                'configurable_attributes' => $configurableAttributes[$id],
+                'feed_spec' => $feedSpecification,
+            ]);
+            $this->eventManager->dispatch(
+                'searchspring_feed_configurable_product_build_before',
+                ['transport' => $beforeProductTransport]
+            );
+            $product = (array) $beforeProductTransport->getData('product');
+
             $product = array_merge(
                 $product,
                 $this->getChildProductsData->getProductData(
@@ -111,7 +134,21 @@ class ConfigurableProductsProvider implements DataProviderInterface
                     $feedSpecification
                 )
             );
+
+            $afterProductTransport = new DataObject([
+                'product' => $product,
+                'product_model' => $productModel,
+                'child_products' => $childProducts[$id],
+                'configurable_attributes' => $configurableAttributes[$id],
+                'feed_spec' => $feedSpecification,
+            ]);
+            $this->eventManager->dispatch(
+                'searchspring_feed_configurable_product_build_after',
+                ['transport' => $afterProductTransport]
+            );
+            $product = (array) $afterProductTransport->getData('product');
         }
+        unset($product);
 
         return $products;
     }
