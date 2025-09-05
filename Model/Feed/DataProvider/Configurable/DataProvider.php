@@ -25,6 +25,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable\Attribute as ConfigurableAttribute;
+use Magento\Framework\DataObject;
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
@@ -257,7 +258,7 @@ class DataProvider
     }
 
     /**
-     * @param Product[] $childProducts
+     * @param DataObject[] $childProducts
      * @return array
      */
     private function processChildProducts(array $childProducts) : array
