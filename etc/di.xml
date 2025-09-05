@@ -334,7 +334,7 @@
         </arguments>
     </type>
 
-    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildCollection">
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>

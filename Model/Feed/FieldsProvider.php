@@ -134,6 +134,10 @@ class FieldsProvider
             $fields[] = TitleToFieldNameConverter::convert($option->getTitle());
         }
 
+        if (count($feedSpecification->getChildFields()) > 1) {
+            $fields[] = 'child_info';
+        }
+
         // Remove ignored fields
         $this->fields = array_unique(array_diff($fields, $feedSpecification->getIgnoreFields()));
         return $this->fields;
