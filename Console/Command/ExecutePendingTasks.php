@@ -20,6 +20,7 @@ namespace SearchSpring\Feed\Console\Command;
 
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 use SearchSpring\Feed\Api\ExecutePendingTasksInterfaceFactory;
 use SearchSpring\Feed\Model\Metric\CollectorInterface;
@@ -30,36 +31,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ExecutePendingTasks extends Command
 {
-    const COMMAND_NAME = 'searchspring:feed:execute-pending-tasks';
-    /**
-     * @var ExecutePendingTasksInterfaceFactory
-     */
+    public const COMMAND_NAME = 'searchspring:feed:execute-pending-tasks';
+
+    /** @var ExecutePendingTasksInterfaceFactory */
     private $executePendingTasksFactory;
-    /**
-     * @var DateTimeFactory
-     */
+
+    /** @var DateTimeFactory */
     private $dateTimeFactory;
-    /**
-     * @var State
-     */
+
+    /** @var State */
     private $state;
-    /**
-     * @var CliOutput
-     */
+
+    /** @var CliOutput */
     private $cliOutput;
-    /**
-     * @var CollectorInterface
-     */
+
+    /** @var CollectorInterface */
     private $metricCollector;
 
     /**
      * ExecutePendingTasks constructor.
+     *
      * @param ExecutePendingTasksInterfaceFactory $executePendingTasksFactory
-     * @param DateTimeFactory $dateTimeFactory
-     * @param State $state
-     * @param CliOutput $cliOutput
-     * @param CollectorInterface $metricCollector
-     * @param string|null $name
+     * @param DateTimeFactory                     $dateTimeFactory
+     * @param State                               $state
+     * @param CliOutput                           $cliOutput
+     * @param CollectorInterface                  $metricCollector
+     * @param string|null                         $name
      */
     public function __construct(
         ExecutePendingTasksInterfaceFactory $executePendingTasksFactory,
@@ -76,10 +73,11 @@ class ExecutePendingTasks extends Command
         $this->cliOutput = $cliOutput;
         $this->metricCollector = $metricCollector;
     }
+
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName(self::COMMAND_NAME)
             ->setDescription('Execute Pending Tasks');
@@ -88,21 +86,33 @@ class ExecutePendingTasks extends Command
     }
 
     /**
-     * @param InputInterface $input
+     * Execute command.
+     *
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     * @return int|void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return int 0 on success, non-zero on failure
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->state->setAreaCode(Area::AREA_FRONTEND);
-        $dateTime = $this->dateTimeFactory->create();
-        $currentDate = $dateTime->gmtDate();
-        $output->writeln("<info>execution started: $currentDate</info>");
-        $this->cliOutput->setOutput($output);
-        $this->metricCollector->setOutput($this->cliOutput);
-        $this->executePendingTasksFactory->create()->execute();
-        $currentDate = $dateTime->gmtDate();
-        $output->writeln("<info>execution ended: $currentDate</info>");
+        try {
+            // Area can already be set in some contexts (e.g., when invoked by other CLI flows)
+            try {
+                $this->state->setAreaCode(Area::AREA_FRONTEND);
+            } catch (LocalizedException $e) {
+                 $output->writeln('<info>Area code is already set.</info>');
+                // Ignore "Area code is already set" and continue
+            }
+
+            $dateTime = $this->dateTimeFactory->create();
+            $output->writeln('<info>execution started: ' . $dateTime->gmtDate() . '</info>');
+            $this->cliOutput->setOutput($output);
+            $this->metricCollector->setOutput($this->cliOutput);
+            $this->executePendingTasksFactory->create()->execute();
+            $output->writeln('<info>execution ended: ' . $dateTime->gmtDate() . '</info>');
+            return Command::SUCCESS; // 0
+        } catch (\Throwable $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            return Command::FAILURE; // 1
+        }
     }
 }
