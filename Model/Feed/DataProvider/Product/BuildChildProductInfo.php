@@ -73,7 +73,7 @@ class BuildChildProductInfo
      * @param ValueProcessor $valueProcessor
      * @param ProviderResolverInterface $priceProviderResolver
      * @param ValueNormalizerInterface $normalizer
-     * @param array<string, string|array{code?:string,label?:string}> $attributeMap
+     * @param array[] $attributeMap
      * @param bool $excludeDisabled
      */
     public function __construct(
@@ -91,8 +91,11 @@ class BuildChildProductInfo
     }
 
     /**
+     * Build child product info array.
+     *
      * @param Product[] $childProducts
      * @param Attribute[] $attributes
+     * @param FeedSpecificationInterface $feedSpecification
      *
      * @return array{child_info: array<int,array{
      *   variant_id:int,
@@ -275,6 +278,8 @@ class BuildChildProductInfo
     }
 
     /**
+     * Build and merge child product info into parent product data.
+     *
      * @param array $productData
      * @param array $childProducts
      * @param array $attributes
@@ -306,8 +311,10 @@ class BuildChildProductInfo
 
     /**
      * Public hook: customize a single child row.
+     *
      * Return null to drop the child.
      *
+     * @param Product $child
      * @param array<string,mixed> $context
      * @param array<string,mixed> $row
      *
@@ -323,10 +330,14 @@ class BuildChildProductInfo
 
     /**
      * Public hook: customize a single attribute row for a child.
+     *
      * Return null to drop the attribute.
      *
+     * @param Product $child
+     * @param Attribute $attribute
      * @param array<string,mixed> $context
      * @param array{code:string,label:string,value:mixed} $row
+     *
      *
      * @return array{code:string,label:string,value:mixed}|null
      */
@@ -340,6 +351,8 @@ class BuildChildProductInfo
     }
 
     /**
+     * Map attribute code/label according to config.
+     *
      * @param string $origCode
      * @param string $origLabel
      *

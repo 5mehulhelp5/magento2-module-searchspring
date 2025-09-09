@@ -49,6 +49,8 @@ class Csv implements FormatterInterface
     }
 
     /**
+     * Format data according to the feed specification
+     *
      * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
      * @return array
@@ -66,6 +68,8 @@ class Csv implements FormatterInterface
     }
 
     /**
+     * Format a single row of data according to the feed specification
+     *
      * @param array $row
      * @param FeedSpecificationInterface $feedSpecification
      * @return array
@@ -76,8 +80,8 @@ class Csv implements FormatterInterface
         $columns = $this->fieldsProvider->getFields($feedSpecification);
         $result = [];
         $multiValuedSeparator = $feedSpecification->getMultiValuedSeparator();
-        foreach($columns as $field) {
-            if(isset($row[$field])) {
+        foreach ($columns as $field) {
+            if (isset($row[$field])) {
                 $value = $row[$field];
                 if (is_array($value)) {
                     // If value is an array of arrays or objects then json encode value

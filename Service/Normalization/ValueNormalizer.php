@@ -7,11 +7,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -28,16 +28,19 @@ class ValueNormalizer implements ValueNormalizerInterface
     /**
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger)
-    {
+    public function __construct(
+        LoggerInterface $logger
+    ) {
         $this->logger = $logger;
     }
 
     /**
-     * @param mixed $value
-     * @param string $attributeCode
+     * Normalize a value for feed output.
      *
-     * @return mixed|null
+     * @param $value
+     * @param $attributeCode
+     *
+     * @return array|mixed|string|null
      */
     public function normalize($value, $attributeCode)
     {
@@ -74,10 +77,11 @@ class ValueNormalizer implements ValueNormalizerInterface
                 return $this->deepReindexNumericArrays($value);
             }
 
-            // numbers/bools/objects -> pass through
+            // numbers/bool/objects -> pass through
             return $value;
         } catch (\Throwable $e) {
             $this->logger->warning(
+                //phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
                 'Skipping attribute, while performing normalizing value, invalid value type ' . gettype($value),
                 [
                     'method' => __METHOD__,
@@ -92,8 +96,9 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Recursively trim strings in arrays, converting empty strings to null.
      *
-     * @param mixed $value
+     * @param $value
      *
      * @return mixed
      */
@@ -116,6 +121,7 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Recursively remove null values from arrays.
      *
      * @param mixed $value
      *
@@ -138,6 +144,7 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Check if the value is an array that is empty or contains only empty arrays (recursively).
      *
      * @param mixed $value
      *
@@ -166,6 +173,7 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Check if the array is a flat list of scalar values (no nested arrays/objects).
      *
      * @param array $values
      *
@@ -183,21 +191,20 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Recursively reindex numeric arrays to ensure they have sequential integer keys starting from 0.
      *
      * @param mixed $value
      *
-     * @return mixed
+     * @return array|mixed
      */
     private function deepReindexNumericArrays($value)
     {
         if (!is_array($value)) {
             return $value;
         }
-        // Recurse first
         foreach ($value as $key => $vv) {
             $value[$key] = $this->deepReindexNumericArrays($vv);
         }
-        // If all keys are numeric, reindex to 0.n-1
         if ($this->isNumericArray($value)) {
             $value = array_values($value);
         }
@@ -206,6 +213,7 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Check if all keys in the array are integers (numeric array).
      *
      * @param array $items
      *
@@ -223,6 +231,8 @@ class ValueNormalizer implements ValueNormalizerInterface
     }
 
     /**
+     * Helper to safely convert a context value to string for logging.
+     *
      * @param $value
      *
      * @return string
