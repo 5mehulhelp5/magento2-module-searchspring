@@ -22,6 +22,7 @@ use Exception;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
+use Psr\Log\LoggerInterface;
 use SearchSpring\Feed\Api\CreateTaskInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
@@ -61,6 +62,11 @@ class CreateTask implements CreateTaskInterface
      */
     private $moduleManager;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     private $moduleList = [
         'Magento_InventoryReservationsApi',
         'Magento_InventorySalesApi',
@@ -75,8 +81,9 @@ class CreateTask implements CreateTaskInterface
      * @param ValidatorPool $validatorPool
      * @param TypeList $typeList
      * @param UniqueCheckerPool $uniqueCheckerPool
-    * @param Manager $moduleManager
+     * @param Manager $moduleManager
      * @param array $moduleList
+     * @param LoggerInterface $logger
      */
     public function __construct(
         TaskRepositoryInterface $taskRepository,
@@ -85,7 +92,9 @@ class CreateTask implements CreateTaskInterface
         TypeList $typeList,
         UniqueCheckerPool $uniqueCheckerPool,
         Manager $moduleManager,
+        LoggerInterface $logger,
         array $moduleList = []
+
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskFactory = $taskFactory;
@@ -94,6 +103,7 @@ class CreateTask implements CreateTaskInterface
         $this->uniqueCheckerPool = $uniqueCheckerPool;
         $this->moduleManager = $moduleManager;
         $this->moduleList = array_merge($this->moduleList, $moduleList);
+        $this->logger = $logger;
     }
 
     /**
@@ -107,8 +117,22 @@ class CreateTask implements CreateTaskInterface
      */
     public function execute(string $type, $payload): TaskInterface
     {
-        if (!$this->isMsiEnabled()) {
-            throw new ValidationException(__('MSI is not installed'));
+        if (!empty($payload['isMsiEnabled']) && $this->isMsiEnabled()) {
+            $this->logger->info(
+                'MSI Check',
+                [
+                    'method' => __METHOD__,
+                    'message' => 'MSI is installed and enabled via payload. Using MSI-dependent logic.',
+                ]
+            );
+        } else {
+            $this->logger->info(
+                'MSI Check',
+                [
+                    'method' => __METHOD__,
+                    'message' => 'MSI is disabled via payload or not installed. Skipping MSI-dependent logic.',
+                ]
+            );
         }
 
         if (!is_array($payload)) {

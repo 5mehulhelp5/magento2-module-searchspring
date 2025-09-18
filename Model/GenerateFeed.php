@@ -37,6 +37,7 @@ use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 use SearchSpring\Feed\Model\Metric\CollectorInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use Psr\Log\LoggerInterface;
 
 class GenerateFeed implements GenerateFeedInterface
 {
@@ -84,6 +85,10 @@ class GenerateFeed implements GenerateFeedInterface
      */
     private $taskRepository;
     private $productCount = '';
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * GenerateFeed constructor.
@@ -97,6 +102,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param CollectorInterface $metricCollector
      * @param AppConfigInterface $appConfig
      * @param TaskRepositoryInterface $taskRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -108,7 +114,9 @@ class GenerateFeed implements GenerateFeedInterface
         ProcessorPool $afterLoadProcessorPool,
         CollectorInterface $metricCollector,
         AppConfigInterface $appConfig,
-        TaskRepositoryInterface $taskRepository
+        TaskRepositoryInterface $taskRepository,
+        LoggerInterface $logger
+
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
@@ -120,6 +128,7 @@ class GenerateFeed implements GenerateFeedInterface
         $this->metricCollector = $metricCollector;
         $this->appConfig = $appConfig;
         $this->taskRepository = $taskRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -356,7 +365,19 @@ class GenerateFeed implements GenerateFeedInterface
 
         $this->systemFieldsList->add('product_model');
         $dataProviders = $this->getDataProviders($feedSpecification);
-        foreach ($dataProviders as $dataProvider) {
+        foreach ($dataProviders as $key => $dataProvider) {
+            // Skip the 'stock' item Skipping stock provider.
+            if ($key === 'stock' && false === $feedSpecification->getMsiStatus()) {
+                $this->logger->info(
+                    'Generate Feed Data Provider',
+                    [
+                        'method' => __METHOD__,
+                        'msiStatus' => $feedSpecification->getMsiStatus(),
+                        'message' => 'MSI is disabled via payload or not installed. Skipping stock data provider MSI-dependent logic.',
+                    ]
+                );
+                continue;  // Skip  iteration
+            }
             $data = $dataProvider->getData($data, $feedSpecification);
         }
 
