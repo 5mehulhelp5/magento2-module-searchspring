@@ -116,6 +116,7 @@ class GetChildCollection
             $this->stockHelper->addInStockFilterToCollection($collection);
         }
 
+        $collection->getSelect()->group('e.entity_id');
         return $collection;
     }
 }
