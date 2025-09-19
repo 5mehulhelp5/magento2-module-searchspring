@@ -73,6 +73,16 @@
                 type="SearchSpring\Feed\Model\Aws\Client\Response"/>
     <preference for="SearchSpring\Feed\Api\CategoryInfoInterface"
                 type="SearchSpring\Feed\Model\CategoryInfo"/>
+    <preference for="SearchSpring\Feed\Api\GetModulesListInterface"
+                type="SearchSpring\Feed\Model\GetModulesList"/>
+    <preference for="SearchSpring\Feed\Api\Data\ModulesListInterface"
+                type="SearchSpring\Feed\Model\Data\ModulesList"/>
+    <preference for="SearchSpring\Feed\Api\GetCronStatusInterface"
+                type="SearchSpring\Feed\Model\GetCronStatus"/>
+    <preference for="SearchSpring\Feed\Api\Data\CronStatusInterface"
+                type="SearchSpring\Feed\Model\Data\CronStatus"/>
+    <preference for="SearchSpring\Feed\Api\Data\CronStatusSearchResultsInterface"
+                type="SearchSpring\Feed\Model\CronStatusSearchResults"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
