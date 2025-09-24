@@ -38,9 +38,10 @@ class LegacyStockResolver implements StockResolverInterface
     }
 
     /**
+     * @param bool $isMsiEnabled
      * @return StockProviderInterface
      */
-    public function resolve(): StockProviderInterface
+    public function resolve(bool $isMsiEnabled): StockProviderInterface
     {
         return $this->legacyStockProvider;
     }

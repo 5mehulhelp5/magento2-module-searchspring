@@ -365,19 +365,7 @@ class GenerateFeed implements GenerateFeedInterface
 
         $this->systemFieldsList->add('product_model');
         $dataProviders = $this->getDataProviders($feedSpecification);
-        foreach ($dataProviders as $key => $dataProvider) {
-            // Skip the 'stock' item Skipping stock provider.
-            if ($key === 'stock' && false === $feedSpecification->getMsiStatus()) {
-                $this->logger->info(
-                    'Generate Feed Data Provider',
-                    [
-                        'method' => __METHOD__,
-                        'msiStatus' => $feedSpecification->getMsiStatus(),
-                        'message' => 'MSI is disabled via payload or not installed. Skipping stock data provider MSI-dependent logic.',
-                    ]
-                );
-                continue;  // Skip  iteration
-            }
+        foreach ($dataProviders as $dataProvider) {
             $data = $dataProvider->getData($data, $feedSpecification);
         }
 
