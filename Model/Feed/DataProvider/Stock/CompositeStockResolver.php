@@ -47,10 +47,11 @@ class CompositeStockResolver implements StockResolverInterface
     }
 
     /**
+     * @param bool $isMsiEnabled
      * @return StockProviderInterface
      * @throws NoSuchEntityException
      */
-    public function resolve(): StockProviderInterface
+    public function resolve(bool $isMsiEnabled): StockProviderInterface
     {
         $sortedResolvers = $this->sort($this->resolvers);
         $provider = null;
@@ -62,7 +63,7 @@ class CompositeStockResolver implements StockResolverInterface
             }
 
             try {
-                $provider = $resolverInstance->resolve();
+                $provider = $resolverInstance->resolve($isMsiEnabled);
             } catch (NoSuchEntityException $exception) {
                 $this->logger->error(
                     "could not resolve stock provider for feed generation",

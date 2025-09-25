@@ -76,15 +76,31 @@ class Csv implements FormatterInterface
         $columns = $this->fieldsProvider->getFields($feedSpecification);
         $result = [];
         $multiValuedSeparator = $feedSpecification->getMultiValuedSeparator();
-        foreach($columns as $field) {
-            if(isset($row[$field])) {
+        foreach ($columns as $field) {
+            if (isset($row[$field])) {
                 $value = $row[$field];
                 if (is_array($value)) {
                     // If value is an array of arrays or objects then json encode value
                     if (is_array(current($value)) || is_object(current($value))) {
                         $result[] = $this->json->serialize($value);
                     } else {
-                        $result[] = implode($multiValuedSeparator, $value);
+                        // If value is an array of scalars then implode using multivalue separator
+                        // Convert booleans to 1/0 and null to empty string
+                        $result[] = implode(
+                            $multiValuedSeparator,
+                            array_map(function ($v) {
+                                if (is_array($v) || is_object($v)) {
+                                    return $this->json->serialize($v);
+                                }
+                                if ($v === null) {
+                                    return '';
+                                }
+                                if (is_bool($v)) {
+                                    return $v ? '1' : '0';
+                                }
+                                return (string) $v;
+                            }, $value)
+                        );
                     }
                 } else {
                     $result[] = $value;

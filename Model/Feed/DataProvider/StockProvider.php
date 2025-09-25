@@ -68,7 +68,7 @@ class StockProvider implements DataProviderInterface
             return $products;
         }
 
-        $stockProvider = $this->stockResolver->resolve();
+        $stockProvider = $this->stockResolver->resolve($feedSpecification->getMsiStatus());
         $storeId = (int) $this->storeManager->getStore($feedSpecification->getStoreCode())->getId();
         $stockData = $stockProvider->getStock($productIds, $storeId);
         foreach ($products as &$product) {

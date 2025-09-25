@@ -85,7 +85,8 @@ class LegacyStockProvider implements StockProviderInterface
 
                 $result[$item->getProductId()] = [
                     'qty' => $item->getQty(),
-                    'in_stock' => $item->getIsInStock()
+                    'in_stock' => $item->getIsInStock(),
+                    'is_stock_managed' => $item->getManageStock()
                 ];
             }
         }

@@ -88,6 +88,8 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
      *
      */
     const PRE_SIGNED_URL = 'presigned_url';
+
+    const MSI_STATUS = true;
     /**
      * @return string|null
      */
@@ -274,4 +276,16 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
     public function setExtensionAttributes(
         \SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface $extensionAttributes
     ): self;
+
+
+    /**
+     * @return bool
+     */
+    public function getMsiStatus() : bool;
+
+    /**
+     * @param bool $value
+     * @return FeedSpecificationInterface
+     */
+    public function setMsiStatus(bool $value) : self;
 }

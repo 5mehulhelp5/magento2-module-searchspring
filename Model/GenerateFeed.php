@@ -37,6 +37,7 @@ use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 use SearchSpring\Feed\Model\Metric\CollectorInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use Psr\Log\LoggerInterface;
 
 class GenerateFeed implements GenerateFeedInterface
 {
@@ -84,6 +85,10 @@ class GenerateFeed implements GenerateFeedInterface
      */
     private $taskRepository;
     private $productCount = '';
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * GenerateFeed constructor.
@@ -97,6 +102,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param CollectorInterface $metricCollector
      * @param AppConfigInterface $appConfig
      * @param TaskRepositoryInterface $taskRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -108,7 +114,9 @@ class GenerateFeed implements GenerateFeedInterface
         ProcessorPool $afterLoadProcessorPool,
         CollectorInterface $metricCollector,
         AppConfigInterface $appConfig,
-        TaskRepositoryInterface $taskRepository
+        TaskRepositoryInterface $taskRepository,
+        LoggerInterface $logger
+
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
@@ -120,6 +128,7 @@ class GenerateFeed implements GenerateFeedInterface
         $this->metricCollector = $metricCollector;
         $this->appConfig = $appConfig;
         $this->taskRepository = $taskRepository;
+        $this->logger = $logger;
     }
 
     /**
