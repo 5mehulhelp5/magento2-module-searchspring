@@ -112,7 +112,7 @@ class ValueProcessor
             }
 
             if (is_bool($value)) {
-                return $value;
+                return $value ? 'true' : 'false';
             }
 
             if ($value === null || $value === '') {

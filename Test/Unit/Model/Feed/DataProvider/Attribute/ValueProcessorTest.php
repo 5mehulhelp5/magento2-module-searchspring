@@ -144,6 +144,10 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
                 ['Red', 'Yellow'],
                 'Red|Yellow',
             ],
+            'simple_duplicated_strings_with_pipe_separator' => [
+                ['Red', 'Red', 'Yellow'],
+                'Red|Red|Yellow',
+            ],
             'simple_strings_with_comma_separator' => [
                 ['Red', 'Purple', 'Yellow'],
                 'Red,Purple,Yellow',
@@ -155,14 +159,22 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
                 ";"
             ],
             'simple_strings_with_hash_separator' => [
-                ['Black', 'White'],
-                'Black#White',
+                ['Black', 'White','white'],
+                'Black#White#white',
                 "#"
             ],
             'simple_strings_with_dollar_sign_separator' => [
                 ['Green', 'Magenta', 'Cosmic Latte'],
                 'Green$Magenta$Cosmic Latte',
                 "$"
+            ],
+            'simple_mixed_strings' => [
+                [false, 'Yellow','false',"false",'FALSE'],
+                'false|Yellow|false|false|FALSE',
+            ],
+            'special_chars' => [
+                ['Żubrówka', 'Crème brûlée', 'Éclair', 'Soufflé', 'Schön', 'Fußball', 'Über'],
+                'Żubrówka|Crème brûlée|Éclair|Soufflé|Schön|Fußball|Über',
             ],
             'price_related_numbers_with_pipe' => [
                 [1200.000000, 1500.000000],
@@ -197,9 +209,13 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
                 'Kayaking$Scuba$Paragliding$Climbing$Rafting$Swimming$Cycling',
                 "$"
             ],
+            'empty'=> [
+                [],
+                '',
+            ],
             'booleans' => [
-                [true],
-                '1',
+                [true, false, 1, 0, 'true', 'false'],
+                'true|false|1|0|true|false',
             ],
             'nulls_and_empties_filtered' => [
                 ['', null, 'Chocolate', 'Butter Scotch'],
