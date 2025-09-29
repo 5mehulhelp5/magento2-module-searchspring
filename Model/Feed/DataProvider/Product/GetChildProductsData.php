@@ -57,42 +57,54 @@ class GetChildProductsData
         array $attributes,
         FeedSpecificationInterface $feedSpecification
     ) : array {
-        $result = [];
+        $childResult = [];
         $ignoredFields = $feedSpecification->getIgnoreFields();
+        $multiValuedSeparator = $feedSpecification->getMultiValuedSeparator();
         foreach($childProducts as $child) {
-            foreach($attributes as $childAttribute) {
+            foreach ($attributes as $childAttribute) {
                 $code = $childAttribute->getAttributeCode();
                 if (in_array($code, $ignoredFields)) {
                     continue;
                 }
 
-                $value = $this->valueProcessor->getValue($childAttribute, $child->getData($code), $child);
+                $value = $this->valueProcessor->getValue(
+                    $childAttribute,
+                    $child->getData($code),
+                    $child
+                );
                 if ($value != '' && !empty($value)) {
-                    $result[$code][] = $value;
+                    $childResult[$code][] = $value;
                 }
             }
 
             if (!in_array('child_sku', $ignoredFields) && $child->getSku() != '') {
-                $result['child_sku'][] = $child->getSku();
+                $childResult['child_sku'][] = $child->getSku();
             }
 
             if (!in_array('child_name', $ignoredFields) && $child->getName() != '') {
-                $result['child_name'][] = $child->getName();
+                $childResult['child_name'][] = $child->getName();
             }
 
             if($feedSpecification->getIncludeChildPrices() && !in_array('child_final_price', $ignoredFields)) {
                 $price = $child->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getMinimalPrice()->getValue();
-                $result['child_final_price'][] = $price;
+                $childResult['child_final_price'][] = $price;
             }
         }
 
-        foreach ($result as $key => &$value) {
+        foreach ($childResult as $key => &$value) {
             if (isset($productData[$key])) {
-                $productDataValue = is_array($productData[$key]) ? $productData[$key] : [$productData[$key]];
+                $productDataValue = is_array($productData[$key])
+                    ? $productData[$key]
+                    : [$productData[$key]];
+
                 $value = array_merge($productDataValue, $value);
+                $value = $this->valueProcessor->toMultiValueString(
+                    $value,
+                    $multiValuedSeparator
+                );
             }
         }
 
-        return $result;
+        return $childResult;
     }
 }
