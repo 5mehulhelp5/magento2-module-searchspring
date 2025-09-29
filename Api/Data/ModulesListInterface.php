@@ -16,16 +16,37 @@
 
 declare(strict_types=1);
 
-namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
+namespace SearchSpring\Feed\Api\Data;
 
-use Magento\Framework\Exception\NoSuchEntityException;
-
-interface StockResolverInterface
+interface ModulesListInterface
 {
     /**
-     * @param bool $isMsiEnabled
-     * @return StockProviderInterface
-     * @throws NoSuchEntityException
+     * Get enabled modules
+     *
+     * @return string[]
      */
-    public function resolve(bool $isMsiEnabled) : StockProviderInterface;
+    public function getEnabled(): array;
+
+    /**
+     * Set enabled modules
+     *
+     * @param string[] $enabled
+     * @return $this
+     */
+    public function setEnabled(array $enabled): self;
+
+    /**
+     * Get disabled modules
+     *
+     * @return string[]
+     */
+    public function getDisabled(): array;
+
+    /**
+     * Set disabled modules
+     *
+     * @param string[] $disabled
+     * @return $this
+     */
+    public function setDisabled(array $disabled): self;
 }

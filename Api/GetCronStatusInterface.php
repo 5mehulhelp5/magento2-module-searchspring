@@ -16,16 +16,17 @@
 
 declare(strict_types=1);
 
-namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
+namespace SearchSpring\Feed\Api;
 
-use Magento\Framework\Exception\NoSuchEntityException;
-
-interface StockResolverInterface
+interface GetCronStatusInterface
 {
     /**
-     * @param bool $isMsiEnabled
-     * @return StockProviderInterface
-     * @throws NoSuchEntityException
+     * Get cron status list for searchspring_task_execution
+     *
+     * @param string $status
+     * @param int $currentPage
+     * @param int $pageSize
+     * @return array
      */
-    public function resolve(bool $isMsiEnabled) : StockProviderInterface;
+    public function getList(string $status = '', int $currentPage = 1, int $pageSize = 20): array;
 }

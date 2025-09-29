@@ -18,8 +18,10 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
+use Psr\Log\LoggerInterface;
 
 class MsiStockResolver implements StockResolverInterface
 {
@@ -29,9 +31,10 @@ class MsiStockResolver implements StockResolverInterface
     private $moduleManager;
 
     /**
-     * @var MsiStockProvider
+     * @var LoggerInterface
      */
-    protected $stockProvider;
+    private $logger;
+
 
     private $moduleList = [
         'Magento_InventoryReservationsApi',
@@ -43,29 +46,49 @@ class MsiStockResolver implements StockResolverInterface
      * MsiStockResolver constructor.
      * @param Manager $moduleManager
      * @param array $moduleList
-     * @param MsiStockProvider $stockProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Manager $moduleManager,
-        MsiStockProvider $stockProvider,
+        LoggerInterface $logger,
         array $moduleList = [],
 
     ) {
         $this->moduleManager = $moduleManager;
+        $this->logger = $logger;
         $this->moduleList = array_merge($this->moduleList, $moduleList);
-        $this->stockProvider = $stockProvider;
     }
 
     /**
+     * @param bool $isMsiEnabled
      * @return StockProviderInterface
      * @throws NoSuchEntityException
      */
-    public function resolve(): StockProviderInterface
+    public function resolve(bool $isMsiEnabled): StockProviderInterface
     {
-        if (!$this->isMsiEnabled()) {
-            throw new NoSuchEntityException(__('MSI is not installed'));
+        if (!empty($isMsiEnabled) && $this->isMsiEnabled()) {
+            $this->logger->info(
+                'MSI Check',
+                [
+                    'method' => __METHOD__,
+                    'isMsiEnabledViaPayload' => $isMsiEnabled,
+                    'isMsiModuleEnabled' => $this->isMsiEnabled(),
+                    'message' => 'MSI is enabled via payload and MSI module is enabled. Using MsiStockProvider for stock resolution.'
+                ]
+            );
+            return ObjectManager::getInstance()->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider');
+        } else {
+            $this->logger->info(
+                'MSI Check',
+                [
+                    'method' => __METHOD__,
+                    'isMsiEnabledViaPayload' => $isMsiEnabled,
+                    'isMsiModuleEnabled' => $this->isMsiEnabled(),
+                    'message' => 'MSI is disabled via payload or MSI modules are not installed. Using LegacyStockProvider for stock resolution.'
+                ]
+            );
+            return ObjectManager::getInstance()->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\LegacyStockProvider');
         }
-        return $this->stockProvider;
     }
 
     /**

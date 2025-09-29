@@ -329,4 +329,21 @@ class Feed extends AbstractExtensibleObject implements FeedSpecificationInterfac
     {
         return $this->setData(self::PRE_SIGNED_URL, $url);
     }
+
+    /**
+     * @return bool
+     */
+    public function getMsiStatus(): bool
+    {
+        return $this->_get(self::MSI_STATUS);
+    }
+
+    /**
+     * @param bool $value
+     * @return FeedSpecificationInterface
+     */
+    public function setMsiStatus(bool $value): FeedSpecificationInterface
+    {
+        return $this->setData(self::MSI_STATUS, $value);
+    }
 }

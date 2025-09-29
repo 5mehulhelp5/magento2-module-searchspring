@@ -74,4 +74,16 @@
             <resource ref="SearchSpring_Feed::task" />
         </resources>
     </route>
+    <route url="/V1/searchspring/moduleslist" method="GET">
+        <service class="SearchSpring\Feed\Api\GetModulesListInterface" method="getModulesList" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/cron/status" method="GET">
+        <service class="SearchSpring\Feed\Api\GetCronStatusInterface" method="getList" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
 </routes>

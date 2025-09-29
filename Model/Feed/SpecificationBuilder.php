@@ -56,7 +56,8 @@ class SpecificationBuilder implements SpecificationBuilderInterface
         'keepAspectRatio' => MediaGallerySpecificationInterface::KEEP_ASPECT_RATIO,
         'imageTypes' => MediaGallerySpecificationInterface::IMAGE_TYPES,
         'includeMediaGallery' => MediaGallerySpecificationInterface::INCLUDE_MEDIA_GALLERY,
-        'preSignedUrl' => FeedSpecificationInterface::PRE_SIGNED_URL
+        'preSignedUrl' => FeedSpecificationInterface::PRE_SIGNED_URL,
+        'isMsiEnabled' => FeedSpecificationInterface::MSI_STATUS
     ];
     /**
      * @var array
@@ -76,6 +77,7 @@ class SpecificationBuilder implements SpecificationBuilderInterface
             FeedSpecificationInterface::INCLUDE_OUT_OF_STOCK => false,
             FeedSpecificationInterface::IGNORE_FIELDS => [],
             FeedSpecificationInterface::FORMAT => MetadataInterface::FORMAT_CSV,
+            FeedSpecificationInterface::MSI_STATUS => true,
         ],
         'media_gallery' => [
             MediaGallerySpecificationInterface::THUMB_WIDTH => 250,
