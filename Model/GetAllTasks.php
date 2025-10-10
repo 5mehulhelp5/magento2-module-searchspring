@@ -101,7 +101,9 @@ class GetAllTasks implements GetAllTasksInterface
 
         $taskItems = [];
         /** @var TaskInterface $task */
-        foreach ($searchResults->getItems() as $task) {
+        $searchResultItems =  $searchResults->getItems();
+
+        foreach ($searchResultItems as $task) {
             $taskItems[] = [
                 'entity_id' => (int)$task->getEntityId(),
                 'type' => $task->getType(),
