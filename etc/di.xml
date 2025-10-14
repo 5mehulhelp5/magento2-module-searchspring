@@ -83,6 +83,8 @@
                 type="SearchSpring\Feed\Model\Data\CronStatus"/>
     <preference for="SearchSpring\Feed\Api\Data\CronStatusSearchResultsInterface"
                 type="SearchSpring\Feed\Model\CronStatusSearchResults"/>
+    <preference for="SearchSpring\Feed\Api\GetAllTasksInterface"
+                type="SearchSpring\Feed\Model\GetAllTasks"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>

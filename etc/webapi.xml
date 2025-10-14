@@ -86,4 +86,10 @@
             <resource ref="SearchSpring_Feed::general" />
         </resources>
     </route>
+    <route url="/V1/searchspring/tasks" method="GET">
+        <service class="SearchSpring\Feed\Api\GetAllTasksInterface" method="getList" />
+        <resources>
+            <resource ref="SearchSpring_Feed::task" />
+        </resources>
+    </route>
 </routes>
