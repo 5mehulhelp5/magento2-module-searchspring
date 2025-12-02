@@ -14,7 +14,7 @@ class CategoryInfo implements CategoryInfoApi
      * @param CategoryList $categoryHelper
      */
     public function __construct(
-        CategoryList $categoryHelper,
+        CategoryList $categoryHelper
     )
     {
         $this->categoryHelper = $categoryHelper;

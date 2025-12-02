@@ -59,7 +59,8 @@ class LoadErrors
         }
         $taskIds = array_map('intval', $taskIds);
         $connection = $this->resourceConnection->getConnection();
-        $select = $connection->select()->from(Task::ERROR_TABLE)
+        $select = $connection->select()
+            ->from($this->resourceConnection->getTableName(Task::ERROR_TABLE))
             ->where('task_id in (?)', $taskIds);
         $errors = $connection->fetchAll($select);
         $result = [];

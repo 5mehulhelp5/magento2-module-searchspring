@@ -30,12 +30,16 @@ class ValueProcessor
     private $cache = [];
 
     private $sourceAttributes = [];
+
     /**
+     * Get the display value for an attribute value
+     *
      * @param Attribute $attribute
      * @param $value
+     * @param Product $product
+     *
      * @return bool|string|null
      * @throws LocalizedException
-     * @throws Exception
      */
     public function getValue(Attribute $attribute, $value, Product $product)
     {
@@ -66,7 +70,10 @@ class ValueProcessor
             if ($result instanceof Phrase) {
                 $result = $result->getText();
             } else {
-                throw new Exception("Unknown value object type " . get_class($result));
+                $debugType = function_exists('get_debug_type')
+                    ? get_debug_type($result)
+                    : gettype($result);
+                throw new Exception("Unknown value object type " . $debugType);
             }
         }
 
@@ -80,17 +87,55 @@ class ValueProcessor
     /**
      *
      */
-    public function reset() : void
+    public function reset(): void
     {
         $this->cache = [];
         $this->sourceAttributes = [];
     }
 
     /**
+     * Convert an array of values into a multi-value string
+     *
+     * @param array $values
+     * @param string $separator
+     *
+     * @return string
+     */
+    public function toMultiValueString(
+        array $values,
+        string $separator = '|'
+    ): string {
+        $normalized = array_map(function ($value) use ($separator) {
+            if (is_array($value)) {
+                // Handle nested arrays (e.g. multi-select)
+                return implode($separator, $value);
+            }
+
+            if (is_bool($value)) {
+                return $value ? 'true' : 'false';
+            }
+
+            if ($value === null || $value === '') {
+                return '';
+            }
+
+            return trim((string)$value);
+        }, $values);
+
+        // Filter out empty strings so we don’t end up with "||"
+        $normalized = array_filter($normalized, function ($val) {
+            return $val !== '';
+        });
+
+        return implode($separator, array_values($normalized));
+    }
+
+    /**
      * @param Attribute $attribute
+     *
      * @return bool
      */
-    private function isSourceAttribute(Attribute $attribute) : bool
+    private function isSourceAttribute(Attribute $attribute): bool
     {
         $code = $attribute->getAttributeCode();
         if (!array_key_exists($code, $this->sourceAttributes)) {

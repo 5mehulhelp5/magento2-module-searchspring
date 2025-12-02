@@ -134,6 +134,7 @@ class FieldsProvider
             $fields[] = TitleToFieldNameConverter::convert($option->getTitle());
         }
 
+
         // Remove ignored fields
         $this->fields = array_unique(array_diff($fields, $feedSpecification->getIgnoreFields()));
         return $this->fields;

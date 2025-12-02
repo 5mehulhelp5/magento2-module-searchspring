@@ -49,6 +49,8 @@ class Csv implements FormatterInterface
     }
 
     /**
+     * Format data according to the feed specification
+     *
      * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
      * @return array
@@ -66,6 +68,8 @@ class Csv implements FormatterInterface
     }
 
     /**
+     * Format a single row of data according to the feed specification
+     *
      * @param array $row
      * @param FeedSpecificationInterface $feedSpecification
      * @return array

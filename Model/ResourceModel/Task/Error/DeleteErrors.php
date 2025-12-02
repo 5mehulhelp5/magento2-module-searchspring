@@ -30,6 +30,7 @@ class DeleteErrors
 
     /**
      * DeleteErrors constructor.
+     *
      * @param ResourceConnection $resourceConnection
      */
     public function __construct(
@@ -41,9 +42,12 @@ class DeleteErrors
     /**
      * @param array $taskIds
      */
-    public function execute(array $taskIds) : void
+    public function execute(array $taskIds): void
     {
         $taskIds = array_map('intval', $taskIds);
-        $this->resourceConnection->getConnection()->delete(Task::ERROR_TABLE, ['task_id IN (?)' => $taskIds]);
+        $this->resourceConnection->getConnection()->delete(
+            $this->resourceConnection->getTableName(Task::ERROR_TABLE),
+            ['task_id IN (?)' => $taskIds]
+        );
     }
 }

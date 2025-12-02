@@ -114,4 +114,131 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->valueProcessor->getValue($attributeMock, $attributeMock, $productMock);
     }
+
+    /**
+     * @dataProvider multiValueProvider
+     */
+    public function testToMultiValueString(
+        array $input,
+        string $expected,
+        string $separator = '|'
+    ): void {
+        $valueProcessor = new ValueProcessor();
+        $result = $valueProcessor->toMultiValueString($input, $separator);
+
+        $this->assertSame(
+            $expected,
+            $result,
+            "Failed asserting that the multi-value string conversion of " . json_encode($input) .
+            " with separator '$separator' equals '$expected'. Got '$result' instead."
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public function multiValueProvider(): array
+    {
+        return [
+            'simple_strings_with_pipe_separator' => [
+                ['Red', 'Yellow'],
+                'Red|Yellow',
+            ],
+            'simple_duplicated_strings_with_pipe_separator' => [
+                ['Red', 'Red', 'Yellow'],
+                'Red|Red|Yellow',
+            ],
+            'simple_strings_with_comma_separator' => [
+                ['Red', 'Purple', 'Yellow'],
+                'Red,Purple,Yellow',
+                ","
+            ],
+            'simple_strings_with_semi_colon_separator' => [
+                ['Red', 'White'],
+                'Red;White',
+                ";"
+            ],
+            'simple_strings_with_hash_separator' => [
+                ['Black', 'White','white'],
+                'Black#White#white',
+                "#"
+            ],
+            'simple_strings_with_dollar_sign_separator' => [
+                ['Green', 'Magenta', 'Cosmic Latte'],
+                'Green$Magenta$Cosmic Latte',
+                "$"
+            ],
+            'simple_mixed_strings' => [
+                [false, 'Yellow','false',"false",'FALSE'],
+                'false|Yellow|false|false|FALSE',
+            ],
+            'special_chars' => [
+                ['Żubrówka', 'Crème brûlée', 'Éclair', 'Soufflé', 'Schön', 'Fußball', 'Über'],
+                'Żubrówka|Crème brûlée|Éclair|Soufflé|Schön|Fußball|Über',
+            ],
+            'price_related_numbers_with_pipe' => [
+                [1200.000000, 1500.000000],
+                '1200|1500',
+            ],
+            'price_related_numbers_dollar_sign' => [
+                [1200.000000, 1500.000000],
+                '1200$1500',
+                '$'
+            ],
+            'price_related_numbers_with_comma_separator' => [
+                [12345.0000, 2345.000000],
+                '12345,2345',
+                ","
+            ],
+            'nested_arrays_multi_select' => [
+                [['Climbing', 'Rafting'], ['Swimming', 'Cycling']],
+                'Climbing|Rafting|Swimming|Cycling',
+            ],
+            'nested_arrays_multi_select_comma_separator' => [
+                [[''],['Climbing', 'Rafting'], ['Swimming', 'Cycling']],
+                'Climbing,Rafting,Swimming,Cycling',
+                ","
+            ],
+            'nested_arrays_multi_select_hash_separator' => [
+                [['Scuba'],['Climbing', 'Rafting'], ['Swimming', 'Cycling']],
+                'Scuba#Climbing#Rafting#Swimming#Cycling',
+                "#"
+            ],
+            'nested_arrays_multi_select_dollar_separator' => [
+                [['Kayaking','Scuba','Paragliding'],['Climbing', 'Rafting'], ['Swimming', 'Cycling']],
+                'Kayaking$Scuba$Paragliding$Climbing$Rafting$Swimming$Cycling',
+                "$"
+            ],
+            'empty'=> [
+                [],
+                '',
+            ],
+            'booleans' => [
+                [true, false, 1, 0, 'true', 'false'],
+                'true|false|1|0|true|false',
+            ],
+            'nulls_and_empties_filtered' => [
+                ['', null, 'Chocolate', 'Butter Scotch'],
+                'Chocolate|Butter Scotch',
+            ],
+            'leading_empty_removed' => [
+                ['', 'XXL', 'L'],
+                'XXL|L',
+            ],
+            'single_value_pipe_separator' => [
+                ['Whey Protein'],
+                'Whey Protein',
+                '|'
+            ],
+            'single_value_comma_separator' => [
+                ['Whey Protein'],
+                'Whey Protein',
+                ','
+            ],
+            'html_content' => [
+                ['<p>Short</p>', '<p>Long</p>'],
+                '<p>Short</p>|<p>Long</p>',
+            ],
+        ];
+    }
 }

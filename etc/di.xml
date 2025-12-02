@@ -344,6 +344,12 @@
         </arguments>
     </type>
 
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+  
     <type name="SearchSpring\Feed\Model\CreateTask">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
@@ -361,7 +367,6 @@
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>
     </type>
-
 
     <virtualType name="SearchSpringFeedGenerateFeedConfigurableChildStorage" type="SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage" />
 

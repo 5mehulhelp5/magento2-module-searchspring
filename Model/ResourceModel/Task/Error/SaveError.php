@@ -66,7 +66,10 @@ class SaveError
                 'code' => $error->getCode(),
                 'message' => $error->getMessage()
             ];
-            $connection->insert(Task::ERROR_TABLE, $data);
+            $connection->insert(
+                $this->resourceConnection->getTableName(Task::ERROR_TABLE),
+                $data
+            );
             $connection->commit();
         } catch (\Exception $exception) {
             $connection->rollBack();
