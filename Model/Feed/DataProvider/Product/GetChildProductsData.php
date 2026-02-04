@@ -70,19 +70,19 @@ class GetChildProductsData
                     $result[$code][] = $value;
                 }
             }
-
-            if (!in_array('child_sku', $ignoredFields) && $child->getSku() != '') {
-                $result['child_sku'][] = $child->getSku();
-            }
-
-            if (!in_array('child_name', $ignoredFields) && $child->getName() != '') {
-                $result['child_name'][] = $child->getName();
-            }
-
-            if($feedSpecification->getIncludeChildPrices() && !in_array('child_final_price', $ignoredFields)) {
-                $price = $child->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getMinimalPrice()->getValue();
-                $result['child_final_price'][] = $price;
-            }
+            // Changes are removed and added on other data provider , keeping commented for now
+//            if (!in_array('child_sku', $ignoredFields) && $child->getSku() != '') {
+//                $result['child_sku'][] = $child->getSku();
+//            }
+//
+//            if (!in_array('child_name', $ignoredFields) && $child->getName() != '') {
+//                $result['child_name'][] = $child->getName();
+//            }
+//
+//            if($feedSpecification->getIncludeChildPrices() && !in_array('child_final_price', $ignoredFields)) {
+//                $price = $child->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getMinimalPrice()->getValue();
+//                $result['child_final_price'][] = $price;
+//            }
         }
 
         foreach ($result as $key => &$value) {

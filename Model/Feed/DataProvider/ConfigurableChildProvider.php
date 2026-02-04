@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\DataProvider;
 
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
@@ -35,7 +36,8 @@ class ConfigurableChildProvider implements DataProviderInterface
      */
     public function __construct(
         Configurable $configurableType,
-    ) {
+    )
+    {
         $this->configurableType = $configurableType;
     }
 
@@ -60,22 +62,20 @@ class ConfigurableChildProvider implements DataProviderInterface
 
             $childProducts = $this->configurableType->getUsedProducts($productModel);
 
-            $configChildData = [
-                'child_sku'  => [],
-                'child_name' => [],
-            ];
-
             foreach ($childProducts as $child) {
-                if (!in_array('child_sku', $ignoredFields) && !empty($child->getSku())) {
-                    $configChildData['child_sku'][] = $child->getSku();
+                if (!in_array('child_sku', $ignoredFields) && $child->getSku() != '') {
+                    $product['child_sku'][] = $child->getSku();
                 }
 
-                if (!in_array('child_name', $ignoredFields) && !empty($child->getName())) {
-                    $configChildData['child_name'][] = $child->getName();
+                if (!in_array('child_name', $ignoredFields) && $child->getName() != '') {
+                    $product['child_name'][] = $child->getName();
+                }
+
+                if ($feedSpecification->getIncludeChildPrices() && !in_array('child_final_price', $ignoredFields)) {
+                    $price = $child->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getMinimalPrice()->getValue();
+                    $product['child_final_price'][] = $price;
                 }
             }
-
-            $product['config_child_data'] = $configChildData;
         }
 
         return $products;
