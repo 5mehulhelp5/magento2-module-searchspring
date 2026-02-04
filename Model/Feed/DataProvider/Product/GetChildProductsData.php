@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (C) 2023 Searchspring <https://searchspring.com>
  * This program is free software: you can redistribute it and/or modify
@@ -8,11 +7,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
@@ -57,54 +56,42 @@ class GetChildProductsData
         array $attributes,
         FeedSpecificationInterface $feedSpecification
     ) : array {
-        $childResult = [];
+        $result = [];
         $ignoredFields = $feedSpecification->getIgnoreFields();
-        $multiValuedSeparator = $feedSpecification->getMultiValuedSeparator();
         foreach($childProducts as $child) {
-            foreach ($attributes as $childAttribute) {
+            foreach($attributes as $childAttribute) {
                 $code = $childAttribute->getAttributeCode();
                 if (in_array($code, $ignoredFields)) {
                     continue;
                 }
 
-                $value = $this->valueProcessor->getValue(
-                    $childAttribute,
-                    $child->getData($code),
-                    $child
-                );
+                $value = $this->valueProcessor->getValue($childAttribute, $child->getData($code), $child);
                 if ($value != '' && !empty($value)) {
-                    $childResult[$code][] = $value;
+                    $result[$code][] = $value;
                 }
             }
 
             if (!in_array('child_sku', $ignoredFields) && $child->getSku() != '') {
-                $childResult['child_sku'][] = $child->getSku();
+                $result['child_sku'][] = $child->getSku();
             }
 
             if (!in_array('child_name', $ignoredFields) && $child->getName() != '') {
-                $childResult['child_name'][] = $child->getName();
+                $result['child_name'][] = $child->getName();
             }
 
             if($feedSpecification->getIncludeChildPrices() && !in_array('child_final_price', $ignoredFields)) {
                 $price = $child->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getMinimalPrice()->getValue();
-                $childResult['child_final_price'][] = $price;
+                $result['child_final_price'][] = $price;
             }
         }
 
-        foreach ($childResult as $key => &$value) {
+        foreach ($result as $key => &$value) {
             if (isset($productData[$key])) {
-                $productDataValue = is_array($productData[$key])
-                    ? $productData[$key]
-                    : [$productData[$key]];
-
+                $productDataValue = is_array($productData[$key]) ? $productData[$key] : [$productData[$key]];
                 $value = array_merge($productDataValue, $value);
-                $value = $this->valueProcessor->toMultiValueString(
-                    $value,
-                    $multiValuedSeparator
-                );
             }
         }
 
-        return $childResult;
+        return $result;
     }
 }
