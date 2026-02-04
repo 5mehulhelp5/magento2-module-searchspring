@@ -122,7 +122,8 @@ class GetChildCollection
                 'e.entity_id = sl.product_id',
                 []
             )
-            ->where('sl.parent_id IN (?)', $parentIds);
+            ->where('sl.parent_id IN (?)', $parentIds)
+            ->group('e.entity_id');
         $collection->addPriceData();
         $collection->getSelect()->columns(['parent_id' => 'sl.parent_id']);
         $collection->load();
