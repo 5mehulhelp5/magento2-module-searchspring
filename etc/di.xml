@@ -258,6 +258,7 @@
                 <item name="options" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\OptionsProvider</item>
                 <item name="__media_gallery__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\MediaGalleryProvider</item>
                 <item name="__json_config__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\JsonConfigProvider</item>
+                <item name="config_child_data" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\ConfigurableChildProvider</item>
             </argument>
         </arguments>
     </type>
@@ -349,7 +350,7 @@
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>
     </type>
-  
+
     <type name="SearchSpring\Feed\Model\CreateTask">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
